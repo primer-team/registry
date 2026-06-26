@@ -1,0 +1,31 @@
+{
+  "name": "@primer/registry",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "bin": {
+    "primer-registry": "./dist/cli/index.js",
+    "registry": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "commander": "^15.0.0",
+    "zod": "^4.4.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/primer-team/registry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/primer-team/registry/issues"
+  },
+  "homepage": "https://github.com/primer-team/registry#readme"
+}
