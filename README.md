@@ -5,11 +5,30 @@
 ## Install
 
 ```bash
-npm install -g primer-team/registry
-registry auth login
+npm install -g github:primer-team/registry
+registry login
+registry whoami
 ```
 
 The CLI is available as both `registry` and `primer-registry`.
+
+Check the installed version with:
+
+```bash
+registry --version
+```
+
+Update by rerunning the GitHub install command:
+
+```bash
+npm install -g github:primer-team/registry
+```
+
+After release tags exist, install a pinned version with:
+
+```bash
+npm install -g github:primer-team/registry#v0.2.0
+```
 
 ## Publish An App
 
@@ -18,6 +37,7 @@ cd /path/to/app/source/
 registry init
 registry check
 registry claim
+registry assets sync
 registry publish
 registry status
 ```
@@ -28,7 +48,7 @@ When no root path is passed, Registry commands default to the current working di
 my-app/                        # project root; override with [root]
 ├── dist/                      # build artifacts uploaded as the version; override with --dist
 ├── src/
-│   ├── registry-assets.gen.ts # optional typed asset helper (registry assets generate)
+│   ├── registry-assets.gen.ts # optional typed asset helper (registry assets sync -g)
 │   └── …                      # app source files, etc.
 ├── manifest.json              # app identity + registryAssets + thumbnailAssetId
 └── …                          # assets, config, etc.
@@ -38,18 +58,18 @@ The source manifest defaults to `<root>/manifest.json` and the built artifact di
 
 `registry init` prepares local manifest metadata. `registry check` validates local readiness. `registry claim` creates or confirms the app identity. `registry publish` submits a version and connects it to `staging`. `registry status` summarizes claim, version, and channel state.
 
-Use global `--json` before any command to request one machine-readable JSON object, for example `registry --json status --app-id my-app`. Leaf command flags such as `registry status --json` remain supported.
+Use global `--json` before any command to request one machine-readable JSON object, for example `registry --json status --app-id my-app`. Leaf command flags such as `registry status --json` remain supported. `--json` is non-interactive but not implicit approval; confirmation-gated mutations such as claiming an app in automation require `--yes --json`.
 
 ## Reusable Assets
 
 ```bash
-registry assets add assets/thumbnail.png --id thumbnail
-registry assets recover --app-id <app-id>
-registry assets generate
-registry assets generate --check
+registry assets sync
+registry assets sync --check
+registry assets sync --generate-typescript
+registry assets sync --check --generate-typescript
 ```
 
-Reusable assets are authored through `registryAssets` in the source manifest. `registry assets recover` merges materialized Registry CDN URLs into inline or file-backed declarations. `registry assets generate` writes a local TypeScript helper, defaulting to `src/registry-assets.gen.ts` unless `registryAssetsModule` or `--out` is set.
+Reusable assets are authored through `registryAssets` in the source manifest. `registry assets sync` uploads or materializes declared local/HTTPS sources, then writes canonical `registryUrl` values back into the same inline or file-backed declarations. `registry assets sync --check` verifies the manifest is already synced without uploading or writing. Add `--generate-typescript` or `-g` to write the optional TypeScript helper from synced `registryUrl` values, defaulting to `src/registry-assets.gen.ts` unless `registryAssetsModule` or `--out` is set.
 
 ## CI Tokens
 

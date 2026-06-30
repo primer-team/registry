@@ -13,9 +13,9 @@ cd /path/to/app/source/
 Install the public Registry CLI and authenticate with a browser session:
 
 ```bash
-npm install -g primer-team/registry
-registry auth login
-registry auth whoami
+npm install -g github:primer-team/registry
+registry login
+registry whoami
 ```
 
 ## Initialize The Manifest
@@ -48,6 +48,8 @@ registry claim
 
 `registry claim` reads the project root and source manifest, validates the app ID, and records ownership in Registry. The app ID becomes the stable identity used by future versions, channel assignments, member operations, and reusable assets.
 
+For non-interactive automation, use `registry claim --yes --json`. `--json` never answers confirmation prompts by itself.
+
 Use an explicit manifest path when needed:
 
 ```bash
@@ -66,14 +68,18 @@ registry status
 Publishing creates an immutable app version from the current manifest and built artifact directory:
 
 ```bash
+registry assets sync       # materialize declared reusable assets and write registryUrl values
+registry assets sync --check
+registry assets sync -g    # optional: write src/registry-assets.gen.ts from synced registryUrl values
 registry publish --dry-run  # preview the upload plan without creating a version
 registry publish            # an immutable version
 ```
 
 A successful publish submits the version and connects it to the `staging` channel, if you have the permission.
 
-Use explicit paths when the manifest or build output is not in the default location:
+Use an explicit root, manifest path, or build output when needed:
 
+```bash
 registry publish <root> --manifest <path> --dist <path>
 ```
 

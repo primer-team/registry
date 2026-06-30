@@ -10,7 +10,7 @@ The built artifact directory must contain the files Registry should upload for t
 
 ## Reusable Assets
 
-Declare reusable app assets in the manifest with `registry assets add`. Local assets are materialized during publish; HTTPS assets are validated as Registry sources.
+Declare reusable app assets in `registryAssets`, then run `registry assets sync` before publishing. Local and HTTPS asset sources are materialized by sync, and publish validates the resulting Registry-backed URLs. If runtime code needs a typed asset helper, run `registry assets sync -g` after assets are synced.
 
 See `registry-assets.md` for the asset flow and app version thumbnail guidance.
 
@@ -36,10 +36,7 @@ type GameBridgeMessage =
   | { bridgeVersion: typeof HOST_BRIDGE_VERSION; type: 'game:complete' }
   | { bridgeVersion: typeof HOST_BRIDGE_VERSION; error: string; type: 'game:error' }
 
-export function connectHostBridge(options: {
-  hostOrigin?: string
-  onInit: (primerPublishableKey: string) => void
-}) {
+export function connectHostBridge(options: { hostOrigin?: string; onInit: (primerPublishableKey: string) => void }) {
   const hostOrigin = options.hostOrigin ?? getDefaultHostOrigin()
 
   function post(message: GameBridgeMessage) {

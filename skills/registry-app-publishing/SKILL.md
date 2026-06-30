@@ -16,7 +16,7 @@ my-app/                      # project root; override with [root]
 ├─ manifest.json             # app identity and asset references
 ├─ dist/                     # build artifacts uploaded as the version; override with --dist
 ├─ src/
-│  ├─ registry-assets.gen.ts # optional typed asset helper; use `registry assets generate`
+│  ├─ registry-assets.gen.ts # optional typed asset helper; use `registry assets sync -g`
 │  └─ …                      # app source files, etc.
 └─ …                         # assets, config, etc.
 ```

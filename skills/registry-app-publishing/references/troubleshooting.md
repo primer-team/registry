@@ -3,7 +3,7 @@
 Start with structured checks:
 
 ```bash
-registry auth whoami
+registry whoami
 registry status
 registry check --json
 ```
@@ -11,7 +11,7 @@ registry check --json
 If authentication fails, run:
 
 ```bash
-registry auth login
+registry login
 ```
 
 For CI, confirm `REGISTRY_ACCESS_TOKEN` is present and has the permissions required by the command. See `ci-publishing.md` for token setup.
