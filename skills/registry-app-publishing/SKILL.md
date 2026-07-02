@@ -26,7 +26,7 @@ The source manifest defaults to `<root>/manifest.json` and the built artifact di
 ## Routes
 
 - `getting-started.md`: first-time app publishing flow: install, authenticate, initialize, validate, claim an app ID, publish, and inspect Registry state.
-- `references/app-constraints.md`: manifest, artifact, asset, thumbnail, and runtime host-bridge requirements for publishable apps.
+- `references/app-constraints.md`: manifest, artifact URL, asset, and thumbnail requirements for publishable apps.
 - `references/registry-assets.md`: reusable Registry assets, HTTPS/local asset sources, asset recovery, and thumbnail declarations.
 - `references/ci-publishing.md`: create Registry access tokens and run check/publish safely from CI.
 - `references/release-operations.md`: approve/reject versions and move staging/prod channel assignments.

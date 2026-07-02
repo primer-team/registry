@@ -36,7 +36,7 @@ Check the project before claiming or publishing:
 registry check
 ```
 
-Publishing assumes the app manifest, built files, assets, thumbnails, and runtime bridge satisfy the constraints in `references/app-constraints.md`, so read it before publishing.
+Publishing assumes the app manifest, built files, assets, and thumbnails satisfy the constraints in `references/app-constraints.md`, so read it before publishing.
 
 ## Claim The App ID
 

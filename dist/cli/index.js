@@ -1,54 +1,54 @@
 #!/usr/bin/env node
-import { Command as Xs } from "commander";
+import { Command as tr } from "commander";
 import { z as i } from "zod";
-import { access as Vt, chmod as Zs, mkdir as Bt, readFile as I, readdir as er, rm as tr, stat as re, writeFile as Ge } from "node:fs/promises";
-import { dirname as sr, isAbsolute as Je, join as x, relative as rr, resolve as T } from "node:path";
-import { existsSync as ze } from "node:fs";
-import { spawn as nr } from "node:child_process";
-import { createInterface as Ft } from "node:readline/promises";
-import { stdin as Jt, stdout as zt } from "node:process";
-import { homedir as ar } from "node:os";
+import { access as Ht, chmod as sr, mkdir as Gt, readFile as I, readdir as rr, rm as nr, stat as Ee, writeFile as Ke } from "node:fs/promises";
+import { dirname as ar, isAbsolute as He, join as B, relative as ir, resolve as T } from "node:path";
+import { existsSync as Ge } from "node:fs";
+import { spawn as or } from "node:child_process";
+import { createInterface as Wt } from "node:readline/promises";
+import { stdin as Qt, stdout as Yt } from "node:process";
+import { homedir as cr } from "node:os";
 import "node:module";
-var ir = Object.create, Ht = Object.defineProperty, or = Object.getOwnPropertyDescriptor, cr = Object.getOwnPropertyNames, dr = Object.getPrototypeOf, ur = Object.prototype.hasOwnProperty, lr = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), pr = (e, t, s, r) => {
+var dr = Object.create, Kt = Object.defineProperty, lr = Object.getOwnPropertyDescriptor, ur = Object.getOwnPropertyNames, pr = Object.getPrototypeOf, mr = Object.prototype.hasOwnProperty, fr = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t.exports), hr = (e, t, s, r) => {
   if (t && typeof t == "object" || typeof t == "function")
-    for (var n = cr(t), a = 0, o = n.length, c; a < o; a++)
-      c = n[a], !ur.call(e, c) && c !== s && Ht(e, c, {
+    for (var n = ur(t), a = 0, o = n.length, c; a < o; a++)
+      c = n[a], !mr.call(e, c) && c !== s && Kt(e, c, {
         get: ((d) => t[d]).bind(null, c),
-        enumerable: !(r = or(t, c)) || r.enumerable
+        enumerable: !(r = lr(t, c)) || r.enumerable
       });
   return e;
-}, mr = (e, t, s) => (s = e != null ? ir(dr(e)) : {}, pr(t || !e || !e.__esModule ? Ht(s, "default", {
+}, gr = (e, t, s) => (s = e != null ? dr(pr(e)) : {}, hr(t || !e || !e.__esModule ? Kt(s, "default", {
   value: e,
   enumerable: !0
 }) : s, e));
-var Gt = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, g = i.string().max(80).regex(Gt, "must be a safe app ID"), M = i.uuid(), We = i.uuid();
-function fr(e) {
+var Xt = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/, g = i.string().max(80).regex(Xt, "must be a safe app ID"), N = i.uuid(), Xe = i.uuid();
+function yr(e) {
   return e.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-{2,}/g, "-").slice(0, 80).replace(/-+$/g, "");
 }
-var hr = [
+var wr = [
   "submitted",
   "approved",
   "rejected"
-], ve = i.enum(hr), gr = ["prod", "staging"], N = i.enum(gr), yr = i.object({
+], Se = i.enum(wr), br = ["prod", "staging"], L = i.enum(br), vr = i.object({
   id: i.string().min(1),
   registryUrl: i.url(),
   materialized: i.boolean(),
   sourceManifestPath: i.string().min(1).optional()
-}), br = ["owner", "member"], de = i.enum(br).describe("Role granted to a user on a claimed app."), Qe = i.object({
-  channelId: N.describe("Distribution channel receiving this version."),
+}), Rr = ["owner", "member"], ue = i.enum(Rr).describe("Role granted to a user on a claimed app."), Ze = i.object({
+  channelId: L.describe("Distribution channel receiving this version."),
   appId: g.describe("Stable app identifier for this assignment."),
-  appVersionId: M.describe("Version currently connected to the channel."),
+  appVersionId: N.describe("Version currently connected to the channel."),
   updatedAt: i.iso.datetime().nullable().describe("Time the channel assignment last changed.")
-}).describe("Current app version assigned to a distribution channel."), X = i.object({
-  id: M.describe("Stable app version identifier."),
+}).describe("Current app version assigned to a distribution channel."), Z = i.object({
+  id: N.describe("Stable app version identifier."),
   appId: g.describe("Stable app identifier that owns this version."),
   title: i.string().min(1),
   tags: i.array(i.string()),
   primerSdkVersion: i.string().nullable(),
-  status: ve.describe("Review lifecycle state for this version."),
-  channels: i.array(Qe).default([]).describe("Channels currently connected to this version.")
+  status: Se.describe("Review lifecycle state for this version."),
+  channels: i.array(Ze).default([]).describe("Channels currently connected to this version.")
 }).describe("Submitted app version and its review state.");
-var j = i.string().trim().min(1).max(500).describe("Short audit reason recorded with the change."), Ye = "channels.write:", Wt = "apps.members.read:", Qt = "apps.members.write:", Pe = "tokens.read:", Ee = "tokens.update:", _e = "tokens.delete:", ke = "tokens.permissions.write:", wr = [
+var k = i.string().trim().min(1).max(500).describe("Short audit reason recorded with the change."), et = "channels.write:", Zt = "apps.members.read:", es = "apps.members.write:", _e = "tokens.read:", ke = "tokens.update:", je = "tokens.delete:", Te = "tokens.permissions.write:", Sr = [
   "apps.claim",
   "apps.delete",
   "versions.publish",
@@ -63,7 +63,7 @@ var j = i.string().trim().min(1).max(500).describe("Short audit reason recorded 
   "users.permissions.write",
   "sessions.revoke",
   "tokens.create"
-], vr = [
+], Ir = [
   "apps.claim",
   "apps.delete",
   "versions.publish",
@@ -73,28 +73,28 @@ var j = i.string().trim().min(1).max(500).describe("Short audit reason recorded 
   "versions.review",
   "allowlist.read",
   "users.read"
-], Yt = [
+], ts = [
   "read",
   "write",
   "reviewer",
   "admin",
   "testing"
-], ec = i.enum(Yt), Rr = i.enum(wr), Sr = i.enum(vr), Ke = i.custom((e) => Kt(e), "Expected channels.write:<channel-slug>"), Ir = i.custom((e) => Tr(e), "Expected apps.members.read:<app-id> or apps.members.write:<app-id>"), tc = i.custom((e) => Zt(e), "Expected apps.members.read:<app-id>"), sc = i.custom((e) => es(e), "Expected apps.members.write:<app-id>"), Ar = i.custom((e) => $r(e), "Expected a token-scoped Registry permission"), rc = i.custom((e) => le(e, Pe), "Expected tokens.read:<token-id>"), nc = i.custom((e) => le(e, Ee), "Expected tokens.update:<token-id>"), ac = i.custom((e) => le(e, _e), "Expected tokens.delete:<token-id>"), ic = i.custom((e) => le(e, ke), "Expected tokens.permissions.write:<token-id>"), Re = i.union([
-  Rr,
-  Ke,
-  Ir,
-  Ar
-]), Xe = i.union([Sr, Ke]), dt = /* @__PURE__ */ new Map([
+], oc = i.enum(ts), Ar = i.enum(Sr), Pr = i.enum(Ir), tt = i.custom((e) => ss(e), "Expected channels.write:<channel-slug>"), Er = i.custom((e) => xr(e), "Expected apps.members.read:<app-id> or apps.members.write:<app-id>"), cc = i.custom((e) => ns(e), "Expected apps.members.read:<app-id>"), dc = i.custom((e) => as(e), "Expected apps.members.write:<app-id>"), _r = i.custom((e) => Ur(e), "Expected a token-scoped Registry permission"), lc = i.custom((e) => me(e, _e), "Expected tokens.read:<token-id>"), uc = i.custom((e) => me(e, ke), "Expected tokens.update:<token-id>"), pc = i.custom((e) => me(e, je), "Expected tokens.delete:<token-id>"), mc = i.custom((e) => me(e, Te), "Expected tokens.permissions.write:<token-id>"), Ie = i.union([
+  Ar,
+  tt,
+  Er,
+  _r
+]), st = i.union([Pr, tt]), pt = /* @__PURE__ */ new Map([
   ["apps.claim", 0],
   ["apps.delete", 1],
-  [Wt, 2],
-  [Qt, 3],
+  [Zt, 2],
+  [es, 3],
   ["versions.publish", 4],
   ["versions.reserved.read", 5],
   ["versions.reserved.write", 6],
   ["versions.delete", 7],
   ["versions.review", 8],
-  [Ye, 9],
+  [et, 9],
   ["allowlist.read", 10],
   ["allowlist.write", 11],
   ["users.read", 12],
@@ -102,48 +102,48 @@ var j = i.string().trim().min(1).max(500).describe("Short audit reason recorded 
   ["users.permissions.write", 14],
   ["sessions.revoke", 15],
   ["tokens.create", 16],
-  [Pe, 17],
-  [Ee, 18],
-  [_e, 19],
-  [ke, 20]
+  [_e, 17],
+  [ke, 18],
+  [je, 19],
+  [Te, 20]
 ]);
-function ut(e) {
-  const t = Pr(e);
-  return t ? [dt.get(t) ?? 0, e] : [dt.get(e) ?? Number.MAX_SAFE_INTEGER, e];
+function mt(e) {
+  const t = kr(e);
+  return t ? [pt.get(t) ?? 0, e] : [pt.get(e) ?? Number.MAX_SAFE_INTEGER, e];
 }
-function Pr(e) {
-  if (Kt(e)) return Ye;
-  if (e.startsWith("apps.members.read:")) return Wt;
-  if (e.startsWith("apps.members.write:")) return Qt;
-  if (e.startsWith("tokens.read:")) return Pe;
-  if (e.startsWith("tokens.update:")) return Ee;
-  if (e.startsWith("tokens.delete:")) return _e;
-  if (e.startsWith("tokens.permissions.write:")) return ke;
+function kr(e) {
+  if (ss(e)) return et;
+  if (e.startsWith("apps.members.read:")) return Zt;
+  if (e.startsWith("apps.members.write:")) return es;
+  if (e.startsWith("tokens.read:")) return _e;
+  if (e.startsWith("tokens.update:")) return ke;
+  if (e.startsWith("tokens.delete:")) return je;
+  if (e.startsWith("tokens.permissions.write:")) return Te;
 }
-function Kt(e) {
+function ss(e) {
   if (typeof e != "string" || !e.startsWith("channels.write:")) return !1;
   const t = e.slice(15);
-  return Gt.test(t);
+  return Xt.test(t);
 }
-function Er(e) {
-  return Ke.parse(`${Ye}${e}`);
+function jr(e) {
+  return tt.parse(`${et}${e}`);
 }
 function F(e) {
-  return Array.from(new Set(e.map((t) => Re.parse(t)))).sort((t, s) => {
-    const [r, n] = ut(t), [a, o] = ut(s);
+  return Array.from(new Set(e.map((t) => Ie.parse(t)))).sort((t, s) => {
+    const [r, n] = mt(t), [a, o] = mt(s);
     return r - a || n.localeCompare(o);
   });
 }
-function Xt(e) {
+function rs(e) {
   return F((Array.isArray(e) ? e : [e]).flatMap((t) => t.split(",")).map((t) => t.trim()).filter(Boolean));
 }
-function _r(e) {
-  return F(e).map((t) => Xe.parse(t));
+function Tr(e) {
+  return F(e).map((t) => st.parse(t));
 }
-function Ze(e) {
-  return Xt(e).map((t) => Xe.parse(t));
+function rt(e) {
+  return rs(e).map((t) => st.parse(t));
 }
-function kr(e, t = {}) {
+function $r(e, t = {}) {
   const s = t.channelIds;
   switch (e) {
     case "read":
@@ -161,7 +161,7 @@ function kr(e, t = {}) {
         "versions.publish",
         "versions.delete",
         "versions.review",
-        ...Me(s ?? ["staging", "prod"])
+        ...Ne(s ?? ["staging", "prod"])
       ]);
     case "admin":
       return F([
@@ -172,7 +172,7 @@ function kr(e, t = {}) {
         "versions.reserved.write",
         "versions.delete",
         "versions.review",
-        ...Me(s ?? ["staging", "prod"]),
+        ...Ne(s ?? ["staging", "prod"]),
         "allowlist.read",
         "users.read"
       ]);
@@ -185,41 +185,41 @@ function kr(e, t = {}) {
         "versions.reserved.write",
         "versions.delete",
         "versions.review",
-        ...Me(s ?? ["staging"])
+        ...Ne(s ?? ["staging"])
       ]);
   }
 }
-var jr = i.array(Re).transform(F), ue = i.array(Xe).transform(_r);
-function Me(e) {
-  return e.map(Er);
+var Cr = i.array(Ie).transform(F), pe = i.array(st).transform(Tr);
+function Ne(e) {
+  return e.map(jr);
 }
-function Tr(e) {
-  return Zt(e) || es(e);
+function xr(e) {
+  return ns(e) || as(e);
 }
-function Zt(e) {
+function ns(e) {
   return typeof e != "string" ? !1 : e.startsWith("apps.members.read:") && g.safeParse(e.slice(18)).success;
 }
-function es(e) {
+function as(e) {
   return typeof e != "string" ? !1 : e.startsWith("apps.members.write:") && g.safeParse(e.slice(19)).success;
 }
-function $r(e) {
+function Ur(e) {
   return [
-    Pe,
-    Ee,
     _e,
-    ke
-  ].some((t) => le(e, t));
+    ke,
+    je,
+    Te
+  ].some((t) => me(e, t));
 }
-function le(e, t) {
-  return typeof e == "string" && e.startsWith(t) && Cr(e.slice(t.length));
+function me(e, t) {
+  return typeof e == "string" && e.startsWith(t) && Or(e.slice(t.length));
 }
-function Cr(e) {
+function Or(e) {
   return /^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(e);
 }
-var ne = Yt, Se = {
+var ae = ts, Ae = {
   email: "email",
   domain: "domain"
-}, L = {
+}, V = {
   listed: "listed",
   found: "found",
   created: "created",
@@ -227,99 +227,99 @@ var ne = Yt, Se = {
   disabled: "disabled",
   updated: "updated",
   revoked: "revoked"
-}, Ur = [
-  L.created,
-  L.enabled,
-  L.disabled
-], lt = i.enum(ne).describe("Named shortcut expanded to concrete Registry user permissions."), ts = i.enum([Se.email, Se.domain]).describe("Whether an allowlist entry matches one email or an email domain."), ss = i.object({
+}, Mr = [
+  V.created,
+  V.enabled,
+  V.disabled
+], ft = i.enum(ae).describe("Named shortcut expanded to concrete Registry user permissions."), is = i.enum([Ae.email, Ae.domain]).describe("Whether an allowlist entry matches one email or an email domain."), os = i.object({
   id: i.string().min(1).describe("Stable email allowlist entry identifier."),
-  entryType: ts,
+  entryType: is,
   value: i.string().min(1).describe("Email address or domain matched by the entry."),
   description: i.string().nullable().describe("Optional admin note for the entry."),
   disabledAt: i.iso.datetime().nullable().describe("Time the entry was disabled, if inactive."),
   createdAt: i.iso.datetime().describe("Time the entry was created."),
   updatedAt: i.iso.datetime().describe("Time the entry last changed.")
-}).describe("Email allowlist entry used for Registry account access."), oc = i.object({
-  entryType: ts,
+}).describe("Email allowlist entry used for Registry account access."), fc = i.object({
+  entryType: is,
   value: i.string().trim().min(1).max(320),
   description: i.string().trim().max(500).optional().nullable(),
-  reason: j
-}), cc = i.object({
+  reason: k
+}), hc = i.object({
   enabled: i.boolean(),
-  reason: j
-}), xr = i.object({
-  status: i.literal(L.listed),
-  entries: i.array(ss)
-}), pt = i.object({
-  status: i.enum(Ur),
-  entry: ss
-}), et = i.object({
+  reason: k
+}), Nr = i.object({
+  status: i.literal(V.listed),
+  entries: i.array(os)
+}), ht = i.object({
+  status: i.enum(Mr),
+  entry: os
+}), nt = i.object({
   id: i.string().min(1).describe("Stable Registry user identifier."),
   email: i.email().nullable().describe("User email address, when available."),
-  permissions: jr.describe("Concrete Registry permissions granted to the user.")
-}).describe("Registry user visible to admin workflows."), Mr = i.object({
-  status: i.literal(L.listed),
-  users: i.array(et)
-}), mt = i.object({
-  status: i.literal(L.found),
-  user: et
-}), dc = i.object({
-  grantPermissions: i.array(Re).optional().default([]),
-  revokePermissions: i.array(Re).optional().default([]),
-  grantPreset: lt.optional(),
-  revokePreset: lt.optional(),
-  reason: j
-}).refine((e) => e.grantPermissions.length > 0 || e.revokePermissions.length > 0 || !!e.grantPreset || !!e.revokePreset, { message: "Grant or revoke at least one permission or preset." }), Or = i.object({
-  status: i.literal(L.updated),
-  user: et,
+  permissions: Cr.describe("Concrete Registry permissions granted to the user.")
+}).describe("Registry user visible to admin workflows."), qr = i.object({
+  status: i.literal(V.listed),
+  users: i.array(nt)
+}), gt = i.object({
+  status: i.literal(V.found),
+  user: nt
+}), gc = i.object({
+  grantPermissions: i.array(Ie).optional().default([]),
+  revokePermissions: i.array(Ie).optional().default([]),
+  grantPreset: ft.optional(),
+  revokePreset: ft.optional(),
+  reason: k
+}).refine((e) => e.grantPermissions.length > 0 || e.revokePermissions.length > 0 || !!e.grantPreset || !!e.revokePreset, { message: "Grant or revoke at least one permission or preset." }), Dr = i.object({
+  status: i.literal(V.updated),
+  user: nt,
   revokedSessionCount: i.number().int().nonnegative().describe("Number of user sessions revoked after permissions were removed.")
-}), uc = i.object({ reason: j }), qr = i.object({
-  status: i.literal(L.revoked),
+}), yc = i.object({ reason: k }), Lr = i.object({
+  status: i.literal(V.revoked),
   userId: i.string().min(1).describe("Stable Registry user identifier."),
   revokedSessionCount: i.number().int().nonnegative().describe("Number of user sessions revoked.")
-}), Nr = class {
+}), Vr = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   listEmailAllowlistEntries() {
-    return this.transport.request("/api/admin/email-allowlist", xr);
+    return this.transport.request("/api/admin/email-allowlist", Nr);
   }
   createEmailAllowlistEntry(e) {
-    return this.transport.request("/api/admin/email-allowlist", pt, {
+    return this.transport.request("/api/admin/email-allowlist", ht, {
       method: "POST",
       body: e
     });
   }
   updateEmailAllowlistEntry(e, t) {
-    return this.transport.request(`/api/admin/email-allowlist/${encodeURIComponent(e)}`, pt, {
+    return this.transport.request(`/api/admin/email-allowlist/${encodeURIComponent(e)}`, ht, {
       method: "PATCH",
       body: t
     });
   }
   listUsers() {
-    return this.transport.request("/api/admin/users", Mr);
+    return this.transport.request("/api/admin/users", qr);
   }
   getUser(e) {
-    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}`, mt);
+    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}`, gt);
   }
   getUserByEmail(e) {
     const t = new URLSearchParams({ email: e });
-    return this.transport.request(`/api/admin/users?${t}`, mt);
+    return this.transport.request(`/api/admin/users?${t}`, gt);
   }
   updateUserPermissions(e, t) {
-    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}`, Or, {
+    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}`, Dr, {
       method: "PATCH",
       body: t
     });
   }
   revokeUserSessions(e, t) {
-    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}/revoke-sessions`, qr, {
+    return this.transport.request(`/api/admin/users/${encodeURIComponent(e)}/revoke-sessions`, Lr, {
       method: "POST",
       body: t
     });
   }
-}, rs = i.discriminatedUnion("exists", [i.object({
+}, cs = i.discriminatedUnion("exists", [i.object({
   appId: g.describe("Stable app identifier being checked."),
   exists: i.literal(!1).describe("Whether the app is already claimed."),
   available: i.literal(!0).describe("Whether this app ID can be claimed.")
@@ -330,31 +330,31 @@ var ne = Yt, Se = {
   deletedAt: i.iso.datetime().nullable().optional().describe("Time this app was soft-deleted, when applicable."),
   claim: i.discriminatedUnion("claimedByCurrentUser", [i.object({
     claimedByCurrentUser: i.literal(!0).describe("Whether the current account has this claim."),
-    role: de.describe("Current account role on the claimed app.")
+    role: ue.describe("Current account role on the claimed app.")
   }), i.object({
     claimedByCurrentUser: i.literal(!1).describe("Whether the current account has this claim."),
     role: i.null().describe("No app role is available for the current account.")
   })])
-})]), Dr = i.object({
+})]), Br = i.object({
   appId: g.describe("Stable app identifier being checked."),
   available: i.boolean().describe("Whether this app ID can be claimed."),
   exists: i.boolean().describe("Whether the app is already claimed.")
-}), Lr = i.object({ apps: i.array(i.object({
+}), Fr = i.object({ apps: i.array(i.object({
   appId: g.describe("Stable app identifier."),
   visibility: i.enum(["private", "public"]).describe("Registry app visibility."),
   status: i.enum(["active", "deleted"]).describe("Registry app lifecycle status."),
   latestVersionId: i.string().nullable().describe("Latest non-deleted app version ID, when one exists.")
-})) }), lc = i.object({
+})) }), wc = i.object({
   appId: g.describe("Stable app identifier to claim."),
   title: i.string().trim().min(1)
-}), Vr = i.object({
+}), zr = i.object({
   appId: g.describe("Stable app identifier that was claimed."),
   created: i.boolean().describe("Whether a new app claim was created."),
-  role: de.describe("Role assigned to the acting app claimant.")
-}), pc = i.object({
-  reason: j,
+  role: ue.describe("Role assigned to the acting app claimant.")
+}), bc = i.object({
+  reason: k,
   force: i.literal(!1).optional().describe("Hard delete is deferred and unsupported.")
-}), Br = i.object({
+}), Jr = i.object({
   app: i.object({
     appId: g.describe("Stable app identifier that remains reserved."),
     deletedAt: i.iso.datetime().describe("Time this app was soft-deleted.")
@@ -372,22 +372,22 @@ var ne = Yt, Se = {
     createdAt: i.iso.datetime().describe("Time the audit event was recorded.")
   })
 });
-function ns(e = {}, t = new URLSearchParams()) {
+function ds(e = {}, t = new URLSearchParams()) {
   return e.query && t.set("query", JSON.stringify(e.query)), e.includeReserved && t.set("includeReserved", "true"), t;
 }
-function ee(e, t) {
+function se(e, t) {
   return t.size ? `${e}?${t}` : e;
 }
-var S = encodeURIComponent, v = {
+var S = encodeURIComponent, R = {
   apps: {
     collection: () => "/api/apps",
     item: (e) => `/api/apps/${S(e)}`,
     availability: (e) => `/api/apps/${S(e)}/availability`,
     history: (e) => `/api/apps/${S(e)}/history`,
-    versions: (e, t = new URLSearchParams()) => ee(`/api/apps/${S(e)}/versions`, t)
+    versions: (e, t = new URLSearchParams()) => se(`/api/apps/${S(e)}/versions`, t)
   },
   versions: {
-    collection: (e = new URLSearchParams()) => ee("/api/versions", e),
+    collection: (e = new URLSearchParams()) => se("/api/versions", e),
     item: (e) => `/api/versions/${S(e)}`,
     approve: (e) => `/api/versions/${S(e)}/approve`,
     reject: (e) => `/api/versions/${S(e)}/reject`,
@@ -395,81 +395,81 @@ var S = encodeURIComponent, v = {
   },
   channels: {
     collection: () => "/api/channels",
-    item: (e, t = new URLSearchParams()) => ee(`/api/channels/${S(e)}`, t),
-    versions: (e, t = new URLSearchParams()) => ee(`/api/channels/${S(e)}/versions`, t),
+    item: (e, t = new URLSearchParams()) => se(`/api/channels/${S(e)}`, t),
+    versions: (e, t = new URLSearchParams()) => se(`/api/channels/${S(e)}/versions`, t),
     version: (e, t) => `/api/channels/${S(e)}/versions/${S(t)}`,
     rollback: (e) => `/api/channels/${S(e)}/rollback`,
-    history: (e, t = new URLSearchParams()) => ee(`/api/channels/${S(e)}/history`, t)
+    history: (e, t = new URLSearchParams()) => se(`/api/channels/${S(e)}/history`, t)
   }
-}, Fr = class {
+}, Hr = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   get(e) {
-    return this.transport.request(v.apps.item(e), rs);
+    return this.transport.request(R.apps.item(e), cs);
   }
   availability(e) {
-    return this.transport.request(v.apps.availability(e), Dr);
+    return this.transport.request(R.apps.availability(e), Br);
   }
   list() {
-    return this.transport.request(v.apps.collection(), Lr);
+    return this.transport.request(R.apps.collection(), Fr);
   }
   create(e) {
-    return this.transport.request(v.apps.collection(), Vr, {
+    return this.transport.request(R.apps.collection(), zr, {
       method: "POST",
       body: e
     });
   }
   delete(e, t) {
-    return this.transport.request(v.apps.item(e), Br, {
+    return this.transport.request(R.apps.item(e), Jr, {
       method: "DELETE",
       body: t
     });
   }
-}, tt = i.object({
+}, at = i.object({
   userId: i.string().min(1).describe("Stable user identifier for the authenticated account."),
   email: i.email().nullable().describe("Account email address, when available.")
-}).describe("Authenticated Registry account returned to the CLI."), Jr = i.object({
+}).describe("Authenticated Registry account returned to the CLI."), Gr = i.object({
   deviceCode: i.string().min(32),
   userCode: i.string().min(4),
   verificationUri: i.url(),
   verificationUriComplete: i.url(),
   expiresIn: i.number().int().positive(),
   interval: i.number().int().positive()
-}), mc = i.object({ deviceCode: i.string().min(32) }), zr = i.discriminatedUnion("status", [i.object({ status: i.literal("pending") }), i.object({
+}), vc = i.object({ deviceCode: i.string().min(32) }), Wr = i.discriminatedUnion("status", [i.object({ status: i.literal("pending") }), i.object({
   status: i.literal("approved"),
   accessToken: i.string().min(1),
   expiresIn: i.number().int().positive(),
   refreshToken: i.string().min(32),
-  account: tt
-})]), fc = i.object({ refreshToken: i.string().min(32) }), Hr = i.object({
+  account: at
+})]), Rc = i.object({ refreshToken: i.string().min(32) }), Qr = i.object({
   accessToken: i.string().min(1),
   expiresIn: i.number().int().positive(),
   refreshToken: i.string().min(32),
-  account: tt
-}), Gr = i.object({ account: tt }), hc = i.object({ refreshToken: i.string().min(32).optional() }), gc = i.object({ userCode: i.string().min(4) }), Wr = class {
+  account: at
+}), Yr = i.object({ account: at }), Sc = i.object({ refreshToken: i.string().min(32).optional() }), Ic = i.object({ userCode: i.string().min(4) }), Kr = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   start() {
-    return this.transport.request("/api/cli/auth/start", Jr, { method: "POST" });
+    return this.transport.request("/api/cli/auth/start", Gr, { method: "POST" });
   }
   poll(e) {
-    return this.transport.request("/api/cli/auth/poll", zr, {
+    return this.transport.request("/api/cli/auth/poll", Wr, {
       method: "POST",
       body: e
     });
   }
   refresh(e) {
-    return this.transport.request("/api/cli/auth/refresh", Hr, {
+    return this.transport.request("/api/cli/auth/refresh", Qr, {
       method: "POST",
       body: e
     });
   }
   whoami() {
-    return this.transport.request("/api/cli/auth/whoami", Gr);
+    return this.transport.request("/api/cli/auth/whoami", Yr);
   }
   revoke(e = {}) {
     return this.transport.requestJson("/api/cli/auth/revoke", {
@@ -477,41 +477,41 @@ var S = encodeURIComponent, v = {
       body: e
     });
   }
-}, Qr = "index.html", Yr = "manifest.json";
-var Kr = ".registry-assets/";
-function as(e) {
-  return en(Kr, e, "registryAssets.source");
+}, Xr = "index.html", ve = "manifest.json";
+var Zr = ".registry-assets/";
+function yt(e) {
+  return sn(Zr, e, "registryAssets.source");
 }
-function Xr(e, t) {
+function en(e, t) {
   if (!e.startsWith(t)) throw new Error(`Object key is outside expected prefix: ${e}`);
-  Zr(e);
+  tn(e);
 }
-function Zr(e) {
+function tn(e) {
   if (e.startsWith("/") || e.includes("\\")) throw new Error(`Unsafe object key: ${e}`);
   for (const t of e.split("/")) if (t === ".." || t === ".") throw new Error(`Unsafe object key segment: ${e}`);
 }
-function pe(e, t = "relativePath") {
+function ee(e, t = "relativePath") {
   if (!e || e.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(e) || e.includes("\\")) throw new Error(`${t} must be a safe relative path`);
   for (const s of e.split("/")) if (!s || s === "." || s === "..") throw new Error(`${t} must be a safe relative path`);
 }
-function en(e, t, s) {
-  pe(t, s);
+function sn(e, t, s) {
+  ee(t, s);
   const r = `${e}${t}`;
-  return Xr(r, e), r;
+  return en(r, e), r;
 }
-var is = i.string().trim().min(1), je = i.string().trim().min(1).regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/), Te = i.object({
-  id: je,
+var ls = i.string().trim().min(1), $e = i.string().trim().min(1).regex(/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/), Ce = i.object({
+  id: $e,
   source: i.string().trim().min(1).optional(),
   registryUrl: i.url().optional()
-}).refine((e) => !!(e.source || e.registryUrl), { message: "registryAssets entries must include source or registryUrl" }), tn = i.object({ assets: i.array(Te) }), os = i.object({
+}).refine((e) => !!(e.source || e.registryUrl), { message: "registryAssets entries must include source or registryUrl" }), rn = i.object({ assets: i.array(Ce) }), us = i.object({
   title: i.string().trim().min(1),
   appId: g.optional(),
-  tags: i.array(is).default([]),
+  tags: i.array(ls).default([]),
   primerSdkVersion: i.string().trim().min(1).nullable().optional(),
-  thumbnailAssetId: je.optional(),
+  thumbnailAssetId: $e.optional(),
   registryAssets: i.unknown().optional(),
   registryAssetsModule: i.string().trim().min(1).optional()
-}).passthrough(), sn = os.superRefine((e, t) => {
+}).passthrough(), nn = us.superRefine((e, t) => {
   "thumbnailAssetKey" in e && t.addIssue({
     code: "custom",
     path: ["thumbnailAssetKey"],
@@ -526,9 +526,9 @@ var is = i.string().trim().min(1), je = i.string().trim().min(1).regex(/^[a-zA-Z
     message: "requiresPrimer is not a Registry manifest field; use primerSdkVersion when Primer runtime behavior is required"
   });
 });
-function $e(e) {
-  const t = sn.parse(e);
-  t.registryAssetsModule && pe(t.registryAssetsModule, "registryAssetsModule");
+function xe(e) {
+  const t = nn.parse(e);
+  t.registryAssetsModule && ee(t.registryAssetsModule, "registryAssetsModule");
   const s = t.primerSdkVersion ?? null;
   return {
     title: t.title,
@@ -536,33 +536,33 @@ function $e(e) {
     tags: t.tags,
     primerSdkVersion: s,
     thumbnailAssetId: t.thumbnailAssetId,
-    registryAssets: an(t.registryAssets),
+    registryAssets: dn(t.registryAssets),
     registryAssetsModule: t.registryAssetsModule
   };
 }
-function cs(e) {
+function an(e) {
   let t;
   try {
     t = JSON.parse(e);
   } catch {
     throw new Error("manifest.json must be valid JSON");
   }
-  return $e(t);
+  return xe(t);
 }
-function ds(e) {
-  const t = tn.parse(e);
-  return us(t.assets), t;
+function ps(e) {
+  const t = rn.parse(e);
+  return ms(t.assets), t;
 }
-function rn(e) {
+function on(e) {
   let t;
   try {
     t = JSON.parse(e);
   } catch {
     throw new Error("Registry assets manifest must be valid JSON");
   }
-  return ds(t);
+  return ps(t);
 }
-function me(e, t = "source") {
+function ie(e, t = "source") {
   try {
     const s = new URL(e);
     if (s.protocol !== "https:") throw new Error(`${t} must be a safe relative path or HTTPS URL`);
@@ -573,26 +573,26 @@ function me(e, t = "source") {
     };
   } catch (s) {
     if (s instanceof Error && s.message === `${t} must be a safe relative path or HTTPS URL`) throw s;
-    return pe(e, t), {
+    return ee(e, t), {
       kind: "artifactPath",
       path: e
     };
   }
 }
-function nn(e, t = "registryUrl") {
+function cn(e, t = "registryUrl") {
   const s = new URL(e);
   if (s.protocol !== "https:" || s.username || s.password) throw new Error(`${t} must be an HTTPS URL`);
   return s.toString();
 }
-function st(e) {
-  const t = i.array(Te).parse(e);
-  return us(t), t;
+function it(e) {
+  const t = i.array(Ce).parse(e);
+  return ms(t), t;
 }
-function an(e) {
+function dn(e) {
   if (e === void 0) return { kind: "none" };
   if (typeof e == "string") return {
     kind: "files",
-    paths: [ft(e)]
+    paths: [wt(e)]
   };
   if (!Array.isArray(e)) throw new Error("registryAssets must be a path, path array, or inline asset array");
   if (e.length === 0) return {
@@ -601,37 +601,37 @@ function an(e) {
   };
   if (e.every((t) => typeof t == "string")) return {
     kind: "files",
-    paths: e.map((t) => ft(t))
+    paths: e.map((t) => wt(t))
   };
   if (e.every((t) => typeof t == "object" && t !== null && !Array.isArray(t))) return {
     kind: "inline",
-    assets: st(e)
+    assets: it(e)
   };
   throw new Error("registryAssets arrays cannot mix manifest paths and inline assets");
 }
-function ft(e) {
-  return pe(e, "registryAssets"), e;
+function wt(e) {
+  return ee(e, "registryAssets"), e;
 }
-function us(e) {
+function ms(e) {
   for (const t of e)
-    t.source && me(t.source, "source"), t.registryUrl && nn(t.registryUrl, "registryUrl");
+    t.source && ie(t.source, "source"), t.registryUrl && cn(t.registryUrl, "registryUrl");
 }
-var ls = i.object({
-  id: je,
+var fs = i.object({
+  id: $e,
   registryUrl: i.url()
-}), on = i.object({
+}), ln = i.object({
   appId: g,
-  assets: i.array(ls)
-}), yc = i.object({
-  assets: i.array(Te).min(1),
+  assets: i.array(fs)
+}), Ac = i.object({
+  assets: i.array(Ce).min(1),
   files: i.array(i.object({
     path: i.string().min(1),
     size: i.number().int().nonnegative(),
     contentType: i.string().min(1)
   }))
-}), cn = i.object({
+}), un = i.object({
   appId: g,
-  uploadId: We,
+  uploadId: Xe,
   expiresAt: i.iso.datetime(),
   files: i.array(i.object({
     path: i.string().min(1),
@@ -639,43 +639,43 @@ var ls = i.object({
     url: i.url(),
     headers: i.record(i.string().min(1), i.string())
   }))
-}), dn = i.enum([
+}), pn = i.enum([
   "materialized",
   "current",
   "repaired",
   "validated"
-]), bc = i.object({ assets: i.array(Te).min(1) }), un = i.object({
+]), Pc = i.object({ assets: i.array(Ce).min(1) }), mn = i.object({
   appId: g,
-  assets: i.array(ls.extend({ action: dn }))
-}), ln = class {
+  assets: i.array(fs.extend({ action: pn }))
+}), fn = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   list(e) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets`, on);
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets`, ln);
   }
   createUpload(e, t) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets/uploads`, cn, {
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets/uploads`, un, {
       method: "POST",
       body: t
     });
   }
   completeUpload(e, t, s) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets/uploads/${encodeURIComponent(t)}/complete`, un, {
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/assets/uploads/${encodeURIComponent(t)}/complete`, mn, {
       method: "POST",
       body: s
     });
   }
-}, pn = i.object({
+}, hn = i.object({
   id: g,
   title: i.string().trim().min(1),
-  tags: i.array(is),
+  tags: i.array(ls),
   primerSdkVersion: i.string().nullable(),
   versionRootUrl: i.url(),
   thumbnailUrl: i.url().nullable()
 });
-function w(e, t, s, r = {}) {
+function v(e, t, s, r = {}) {
   return {
     code: e,
     message: t,
@@ -683,16 +683,16 @@ function w(e, t, s, r = {}) {
     ...r
   };
 }
-var mn = i.union([
+var gn = i.union([
   i.string(),
   i.number(),
   i.boolean(),
   i.null()
-]), ae = i.lazy(() => i.union([
-  mn,
-  i.array(ae),
-  i.record(i.string(), ae)
-])), wc = i.record(i.string(), ae), ps = [
+]), oe = i.lazy(() => i.union([
+  gn,
+  i.array(oe),
+  i.record(i.string(), oe)
+])), Ec = i.record(i.string(), oe), hs = [
   "eq",
   "ne",
   "in",
@@ -700,41 +700,41 @@ var mn = i.union([
   "contains",
   "exists",
   "matches"
-], ms = i.enum(ps), fs = i.strictObject({
+], gs = i.enum(hs), ys = i.strictObject({
   pointer: i.string(),
-  op: ms,
-  value: ae.optional()
-}), Oe = i.lazy(() => i.union([
-  fs,
-  i.strictObject({ all: i.array(Oe) }),
-  i.strictObject({ any: i.array(Oe) }),
-  i.strictObject({ not: Oe })
+  op: gs,
+  value: oe.optional()
+}), qe = i.lazy(() => i.union([
+  ys,
+  i.strictObject({ all: i.array(qe) }),
+  i.strictObject({ any: i.array(qe) }),
+  i.strictObject({ not: qe })
 ]));
-function fn(e, t) {
+function yn(e, t) {
   const s = t.allowedPointers;
   return s ? typeof s == "function" ? s(e) : s.includes(e) : !0;
 }
-function hn(e, t, s) {
+function wn(e, t, s) {
   const r = s.allowedOperators;
   return r ? typeof r == "function" ? r(e, t) : r.includes(e) : !0;
 }
-function gn(e) {
+function bn(e) {
   return {
     success: !0,
     data: e
   };
 }
-function yn(e) {
+function vn(e) {
   return {
     success: !1,
     error: e
   };
 }
-var hs = /^(?:\/(?:[^~/]|~0|~1)*)*$/, vc = i.string().nonempty().regex(hs);
-function bn(e) {
-  return hs.test(e);
+var ws = /^(?:\/(?:[^~/]|~0|~1)*)*$/, _c = i.string().nonempty().regex(ws);
+function Rn(e) {
+  return ws.test(e);
 }
-var wn = new Set(fs.keyof().options), vn = /* @__PURE__ */ new Set([
+var Sn = new Set(ys.keyof().options), In = /* @__PURE__ */ new Set([
   "eq",
   "ne",
   "in",
@@ -742,13 +742,13 @@ var wn = new Set(fs.keyof().options), vn = /* @__PURE__ */ new Set([
   "contains",
   "matches"
 ]);
-function Rn(e, t = {}) {
-  const s = [], r = rt(e, [], s, t);
-  return s.length > 0 || r === void 0 ? yn(s) : gn(r);
+function An(e, t = {}) {
+  const s = [], r = ot(e, [], s, t);
+  return s.length > 0 || r === void 0 ? vn(s) : bn(r);
 }
-function rt(e, t, s, r) {
-  if (!In(e)) {
-    s.push(w("invalid_expr", "RQL expr must be an object.", t));
+function ot(e, t, s, r) {
+  if (!En(e)) {
+    s.push(v("invalid_expr", "RQL expr must be an object.", t));
     return;
   }
   const n = [
@@ -757,31 +757,31 @@ function rt(e, t, s, r) {
     "not"
   ].filter((o) => o in e), a = "pointer" in e || "op" in e;
   if (n.length > 0 && a) {
-    s.push(w("invalid_composition", "RQL expr cannot mix predicate and composition keys.", t));
+    s.push(v("invalid_composition", "RQL expr cannot mix predicate and composition keys.", t));
     return;
   }
   if (n.length > 1) {
-    s.push(w("invalid_composition", "RQL expr must use only one composition key.", t));
+    s.push(v("invalid_composition", "RQL expr must use only one composition key.", t));
     return;
   }
-  if (n[0] === "all") return ht(e.all, "all", t, s, r);
-  if (n[0] === "any") return ht(e.any, "any", t, s, r);
+  if (n[0] === "all") return bt(e.all, "all", t, s, r);
+  if (n[0] === "any") return bt(e.any, "any", t, s, r);
   if (n[0] === "not") {
-    const o = rt(e.not, [...t, "not"], s, r);
+    const o = ot(e.not, [...t, "not"], s, r);
     return o === void 0 ? void 0 : { not: o };
   }
-  return Sn(e, t, s, r);
+  return Pn(e, t, s, r);
 }
-function ht(e, t, s, r, n) {
+function bt(e, t, s, r, n) {
   if (!Array.isArray(e)) {
-    r.push(w("invalid_composition", `RQL ${t} composition must be an array.`, [...s, t]));
+    r.push(v("invalid_composition", `RQL ${t} composition must be an array.`, [...s, t]));
     return;
   }
   if (e.length === 0) {
-    r.push(w("empty_composition", `RQL ${t} composition must contain at least one expr.`, [...s, t]));
+    r.push(v("empty_composition", `RQL ${t} composition must contain at least one expr.`, [...s, t]));
     return;
   }
-  const a = e.map((o, c) => rt(o, [
+  const a = e.map((o, c) => ot(o, [
     ...s,
     t,
     String(c)
@@ -789,76 +789,76 @@ function ht(e, t, s, r, n) {
   if (a.length === e.length)
     return t === "all" ? { all: a } : { any: a };
 }
-function Sn(e, t, s, r) {
-  const n = Object.keys(e).filter((m) => !wn.has(m));
+function Pn(e, t, s, r) {
+  const n = Object.keys(e).filter((h) => !Sn.has(h));
   if (n.length > 0) {
-    s.push(w("invalid_expr", `Unknown RQL predicate keys: ${n.join(", ")}.`, t));
+    s.push(v("invalid_expr", `Unknown RQL predicate keys: ${n.join(", ")}.`, t));
     return;
   }
-  const a = e.pointer, o = e.op, c = ms.safeParse(o);
+  const a = e.pointer, o = e.op, c = gs.safeParse(o);
   let d = !1;
-  if (typeof a != "string" ? s.push(w("invalid_pointer", "RQL predicate pointer must be a JSON Pointer string.", [...t, "pointer"])) : bn(a) ? a === "" ? s.push(w("root_pointer_disallowed", "RQL predicates cannot target the root JSON Pointer.", [...t, "pointer"], { pointer: a })) : fn(a, r) ? d = !0 : s.push(w("pointer_not_allowed", "RQL predicate pointer is not allowed by policy.", [...t, "pointer"], { pointer: a })) : s.push(w("invalid_pointer", "RQL predicate pointer must use RFC 6901 JSON Pointer syntax.", [...t, "pointer"], { pointer: a })), c.success ? typeof a == "string" && d && !hn(c.data, a, r) && s.push(w("operator_not_allowed", "RQL predicate operator is not allowed by policy.", [...t, "op"], {
+  if (typeof a != "string" ? s.push(v("invalid_pointer", "RQL predicate pointer must be a JSON Pointer string.", [...t, "pointer"])) : Rn(a) ? a === "" ? s.push(v("root_pointer_disallowed", "RQL predicates cannot target the root JSON Pointer.", [...t, "pointer"], { pointer: a })) : yn(a, r) ? d = !0 : s.push(v("pointer_not_allowed", "RQL predicate pointer is not allowed by policy.", [...t, "pointer"], { pointer: a })) : s.push(v("invalid_pointer", "RQL predicate pointer must use RFC 6901 JSON Pointer syntax.", [...t, "pointer"], { pointer: a })), c.success ? typeof a == "string" && d && !wn(c.data, a, r) && s.push(v("operator_not_allowed", "RQL predicate operator is not allowed by policy.", [...t, "op"], {
     pointer: a,
     op: c.data
-  })) : s.push(w("unknown_operator", "RQL predicate operator is not supported.", [...t, "op"], { op: String(o) })), !c.success || typeof a != "string") return;
-  const u = c.data, l = Object.hasOwn(e, "value");
-  u === "exists" && l && s.push(w("unexpected_value", "RQL exists predicates must not include a value.", [...t, "value"], {
+  })) : s.push(v("unknown_operator", "RQL predicate operator is not supported.", [...t, "op"], { op: String(o) })), !c.success || typeof a != "string") return;
+  const l = c.data, u = Object.hasOwn(e, "value");
+  l === "exists" && u && s.push(v("unexpected_value", "RQL exists predicates must not include a value.", [...t, "value"], {
     pointer: a,
-    op: u
-  })), vn.has(u) && !l && s.push(w("missing_value", `RQL ${u} predicates require a value.`, [...t, "value"], {
+    op: l
+  })), In.has(l) && !u && s.push(v("missing_value", `RQL ${l} predicates require a value.`, [...t, "value"], {
     pointer: a,
-    op: u
+    op: l
   }));
   const p = e.value;
-  if (l && !ae.safeParse(p).success && s.push(w("invalid_value", "RQL predicate value must be JSON-serializable.", [...t, "value"], {
+  if (u && !oe.safeParse(p).success && s.push(v("invalid_value", "RQL predicate value must be JSON-serializable.", [...t, "value"], {
     pointer: a,
-    op: u
-  })), (u === "in" || u === "nin") && l && !Array.isArray(p) && s.push(w("invalid_value", `RQL ${u} predicates require an array value.`, [...t, "value"], {
+    op: l
+  })), (l === "in" || l === "nin") && u && !Array.isArray(p) && s.push(v("invalid_value", `RQL ${l} predicates require an array value.`, [...t, "value"], {
     pointer: a,
-    op: u
-  })), u === "matches" && l && typeof p != "string" && s.push(w("invalid_value", "RQL matches predicates require a string regex pattern value.", [...t, "value"], {
+    op: l
+  })), l === "matches" && u && typeof p != "string" && s.push(v("invalid_value", "RQL matches predicates require a string regex pattern value.", [...t, "value"], {
     pointer: a,
-    op: u
-  })), u === "matches" && typeof p == "string" && r.maxRegexPatternLength !== void 0 && p.length > r.maxRegexPatternLength && s.push(w("regex_pattern_too_long", "RQL matches pattern exceeds the policy maximum length.", [...t, "value"], {
+    op: l
+  })), l === "matches" && typeof p == "string" && r.maxRegexPatternLength !== void 0 && p.length > r.maxRegexPatternLength && s.push(v("regex_pattern_too_long", "RQL matches pattern exceeds the policy maximum length.", [...t, "value"], {
     pointer: a,
-    op: u
-  })), s.length === 0 || !gt(s, t)) {
-    const m = l ? {
+    op: l
+  })), s.length === 0 || !vt(s, t)) {
+    const h = u ? {
       pointer: a,
-      op: u,
+      op: l,
       value: p
     } : {
       pointer: a,
-      op: u
-    }, A = r.validateValue?.({
+      op: l
+    }, b = r.validateValue?.({
       pointer: a,
-      op: u,
+      op: l,
       value: p,
-      predicate: m,
+      predicate: h,
       path: t
     });
-    (A === !1 || typeof A == "string") && s.push(w("value_rejected", typeof A == "string" ? A : "RQL predicate value is not allowed by policy.", [...t, "value"], {
+    (b === !1 || typeof b == "string") && s.push(v("value_rejected", typeof b == "string" ? b : "RQL predicate value is not allowed by policy.", [...t, "value"], {
       pointer: a,
-      op: u
+      op: l
     }));
   }
-  if (!gt(s, t))
-    return l ? {
+  if (!vt(s, t))
+    return u ? {
       pointer: a,
-      op: u,
+      op: l,
       value: p
     } : {
       pointer: a,
-      op: u
+      op: l
     };
 }
-function gt(e, t) {
+function vt(e, t) {
   return e.some((s) => t.every((r, n) => s.path[n] === r));
 }
-function In(e) {
+function En(e) {
   return typeof e == "object" && e !== null && !Array.isArray(e);
 }
-var An = {
+var _n = {
   allowedPointers: [
     "/appId",
     "/id",
@@ -867,7 +867,7 @@ var An = {
     "/tags",
     "/title"
   ],
-  allowedOperators: (e, t) => kn[t]?.includes(e) ?? !1,
+  allowedOperators: (e, t) => $n[t]?.includes(e) ?? !1,
   maxRegexPatternLength: 128,
   validateValue: ({ pointer: e, op: t, value: s }) => {
     if (e === "/tags") {
@@ -879,34 +879,34 @@ var An = {
     if (t === "in" || t === "nin") return Array.isArray(s) && s.every((r) => typeof r == "string" || r === null) ? void 0 : `RQL ${t} value must be an array of strings or null.`;
     if (t !== "exists") return typeof s == "string" || s === null || "RQL scalar value must be a string or null.";
   }
-}, we = i.lazy(() => i.union([
+}, Re = i.lazy(() => i.union([
   i.object({
     pointer: i.string(),
-    op: i.enum(ps),
+    op: i.enum(hs),
     value: i.any().optional()
   }),
-  i.object({ all: i.array(we) }),
-  i.object({ any: i.array(we) }),
-  i.object({ not: we })
-])), Pn = we.superRefine((e, t) => {
-  const s = Rn(e, An);
+  i.object({ all: i.array(Re) }),
+  i.object({ any: i.array(Re) }),
+  i.object({ not: Re })
+])), kn = Re.superRefine((e, t) => {
+  const s = An(e, _n);
   if (!s.success)
     for (const r of s.error) t.addIssue({
       code: "custom",
       message: r.message,
       path: r.path
     });
-}), En = i.preprocess((e) => {
+}), jn = i.preprocess((e) => {
   if (typeof e != "string") return e;
   try {
     return JSON.parse(e);
   } catch {
     return e;
   }
-}, Pn), _n = i.preprocess((e) => {
+}, kn), Tn = i.preprocess((e) => {
   if (e !== void 0)
     return e === !0 || e === "true" ? !0 : e === !1 || e === "false" ? !1 : e;
-}, i.boolean().optional()), kn = {
+}, i.boolean().optional()), $n = {
   "/appId": [
     "eq",
     "ne",
@@ -952,68 +952,68 @@ var An = {
     "exists",
     "matches"
   ]
-}, jn = i.object({ query: En.describe("Registry RQL expr encoded as JSON.").optional() }), Tn = jn.extend({ includeReserved: _n.describe("Include registry-reserved versions.").optional() }), $n = i.object({
-  channel: i.object({ id: N.describe("Stable distribution channel identifier.") }),
-  apps: i.array(pn)
-}), Cn = i.object({ channels: i.array(i.object({ id: N.describe("Stable distribution channel identifier.") })) }), Un = i.object({
-  channel: i.object({ id: N.describe("Stable distribution channel identifier.") }).optional(),
-  assignments: i.array(Qe)
-}), Rc = i.object({
-  appVersionId: M.describe("Version to connect to the channel."),
-  reason: j.optional()
-}).describe("Assigns a channel to a specific app version."), Sc = i.object({ reason: j.optional() }).describe("Removes the current app version assignment from a channel."), xn = ["rolled_back", "dry_run"], yt = i.object({
-  channel: i.object({ id: N.describe("Stable distribution channel identifier.") }),
-  appVersion: X
-}), Ic = i.object({
+}, Cn = i.object({ query: jn.describe("Registry RQL expr encoded as JSON.").optional() }), xn = Cn.extend({ includeReserved: Tn.describe("Include registry-reserved versions.").optional() }), Un = i.object({
+  channel: i.object({ id: L.describe("Stable distribution channel identifier.") }),
+  apps: i.array(hn)
+}), On = i.object({ channels: i.array(i.object({ id: L.describe("Stable distribution channel identifier.") })) }), Mn = i.object({
+  channel: i.object({ id: L.describe("Stable distribution channel identifier.") }).optional(),
+  assignments: i.array(Ze)
+}), kc = i.object({
+  appVersionId: N.describe("Version to connect to the channel."),
+  reason: k.optional()
+}).describe("Assigns a channel to a specific app version."), jc = i.object({ reason: k.optional() }).describe("Removes the current app version assignment from a channel."), Nn = ["rolled_back", "dry_run"], Rt = i.object({
+  channel: i.object({ id: L.describe("Stable distribution channel identifier.") }),
+  appVersion: Z
+}), Tc = i.object({
   appId: g.describe("Stable app identifier whose channel is rolled back."),
-  toVersionId: M.describe("Specific version to reconnect, if selected.").optional(),
-  reason: j.optional(),
+  toVersionId: N.describe("Specific version to reconnect, if selected.").optional(),
+  reason: k.optional(),
   dryRun: i.boolean().describe("Preview rollback eligibility without changing the channel.").optional()
-}), Mn = i.object({
-  status: i.enum(xn).describe("Whether rollback was applied or previewed."),
-  channel: i.object({ id: N.describe("Stable distribution channel identifier.") }),
-  currentAssignment: Qe.describe("Assignment before rollback is applied."),
-  targetAppVersion: X.describe("Version selected as the rollback target."),
+}), qn = i.object({
+  status: i.enum(Nn).describe("Whether rollback was applied or previewed."),
+  channel: i.object({ id: L.describe("Stable distribution channel identifier.") }),
+  currentAssignment: Ze.describe("Assignment before rollback is applied."),
+  targetAppVersion: Z.describe("Version selected as the rollback target."),
   eligibility: i.object({
-    channelId: N.describe("Channel evaluated for rollback."),
-    targetStatus: ve.describe("Review state of the rollback target."),
-    allowedStatuses: i.array(ve).describe("Version states allowed on this channel.")
+    channelId: L.describe("Channel evaluated for rollback."),
+    targetStatus: Se.describe("Review state of the rollback target."),
+    allowedStatuses: i.array(Se).describe("Version states allowed on this channel.")
   }),
-  reason: j.optional()
-}), On = class {
+  reason: k.optional()
+}), Dn = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   list() {
-    return this.transport.request(v.channels.collection(), Cn);
+    return this.transport.request(R.channels.collection(), On);
   }
   get(e, t = {}) {
-    return this.transport.request(v.channels.item(e, ns(t)), $n);
+    return this.transport.request(R.channels.item(e, ds(t)), Un);
   }
   assignments(e, t = {}) {
     const s = new URLSearchParams();
-    return t.appId && s.set("appId", t.appId), this.transport.request(v.channels.versions(e, s), Un);
+    return t.appId && s.set("appId", t.appId), this.transport.request(R.channels.versions(e, s), Mn);
   }
   connect(e, t) {
-    return this.transport.request(v.channels.versions(e), yt, {
+    return this.transport.request(R.channels.versions(e), Rt, {
       method: "POST",
       body: t
     });
   }
   disconnect(e, t, s = {}) {
-    return this.transport.request(v.channels.version(e, t), yt, {
+    return this.transport.request(R.channels.version(e, t), Rt, {
       method: "DELETE",
       body: s
     });
   }
   rollback(e, t) {
-    return this.transport.request(v.channels.rollback(e), Mn, {
+    return this.transport.request(R.channels.rollback(e), qn, {
       method: "POST",
       body: t
     });
   }
-}, qn = i.enum([
+}, Ln = i.enum([
   "version_submitted",
   "version_approved",
   "version_rejected",
@@ -1021,62 +1021,62 @@ var An = {
   "channel_connected",
   "channel_disconnected",
   "channel_reconnected"
-]).describe("Audit event kind for version review and channel changes."), Nn = i.object({
+]).describe("Audit event kind for version review and channel changes."), Vn = i.object({
   eventId: i.string().min(1).describe("Stable audit event identifier."),
-  eventType: qn,
+  eventType: Ln,
   appId: g.describe("Stable app identifier for the event."),
-  appVersionId: M.nullable().describe("Version affected by the event, when any."),
-  channelId: N.nullable().describe("Channel affected by the event, when any."),
+  appVersionId: N.nullable().describe("Version affected by the event, when any."),
+  channelId: L.nullable().describe("Channel affected by the event, when any."),
   actorUserId: i.string().min(1).nullable().describe("User ID that performed the event."),
   actorEmail: i.email().nullable().describe("Email for the actor, when available."),
   reason: i.string().nullable().describe("Audit reason recorded with the event."),
-  previousAppVersionId: M.nullable().describe("Prior channel version, when changed."),
-  nextAppVersionId: M.nullable().describe("Next channel version, when changed."),
+  previousAppVersionId: N.nullable().describe("Prior channel version, when changed."),
+  nextAppVersionId: N.nullable().describe("Next channel version, when changed."),
   createdAt: i.iso.datetime().describe("Time the audit event was recorded.")
-}).describe("Audit event for version review or channel assignment changes."), qe = i.object({ events: i.array(Nn) }), Dn = class {
+}).describe("Audit event for version review or channel assignment changes."), De = i.object({ events: i.array(Vn) }), Bn = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   app(e) {
-    return this.transport.request(v.apps.history(e), qe);
+    return this.transport.request(R.apps.history(e), De);
   }
   version(e) {
-    return this.transport.request(v.versions.history(e), qe);
+    return this.transport.request(R.versions.history(e), De);
   }
   channel(e, t) {
     const s = new URLSearchParams({ appId: t.appId });
-    return this.transport.request(v.channels.history(e, s), qe);
+    return this.transport.request(R.channels.history(e, s), De);
   }
-}, gs = i.object({
+}, bs = i.object({
   userId: i.string().min(1).describe("Stable user identifier for the member."),
   email: i.email().nullable().describe("Member email address, when available."),
-  role: de.describe("Role granted to the app member."),
+  role: ue.describe("Role granted to the app member."),
   createdAt: i.iso.datetime().nullable().describe("Time the membership was created."),
   updatedAt: i.iso.datetime().nullable().describe("Time the membership last changed.")
-}).describe("User membership on a claimed app."), Ln = i.object({ members: i.array(gs) }), Ac = i.object({
+}).describe("User membership on a claimed app."), Fn = i.object({ members: i.array(bs) }), $c = i.object({
   email: i.email().optional(),
   userId: i.string().min(1).describe("Stable user identifier for the member.").optional(),
-  role: de
+  role: ue
 }).refine((e) => !!e.email != !!e.userId, {
   message: "Provide exactly one member selector: email or userId",
   path: ["email"]
-}), Pc = i.object({ role: de }), bt = i.object({ member: gs }), Vn = class {
+}), Cc = i.object({ role: ue }), St = i.object({ member: bs }), zn = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   list(e) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members`, Ln);
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members`, Fn);
   }
   add(e, t) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members`, bt, {
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members`, St, {
       method: "POST",
       body: t
     });
   }
   setRole(e, t, s) {
-    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members/${encodeURIComponent(t)}`, bt, {
+    return this.transport.request(`/api/apps/${encodeURIComponent(e)}/members/${encodeURIComponent(t)}`, St, {
       method: "PATCH",
       body: s
     });
@@ -1084,7 +1084,7 @@ var An = {
   async remove(e, t) {
     await this.transport.requestJson(`/api/apps/${encodeURIComponent(e)}/members/${encodeURIComponent(t)}`, { method: "DELETE" });
   }
-}, Bn = [
+}, Jn = [
   "created",
   "title_changed",
   "permissions_changed",
@@ -1092,119 +1092,119 @@ var An = {
   "apps.access.revoked",
   "deleted",
   "auth_failed"
-], Ec = i.enum(Bn), Fn = i.string().regex(/^prt_[A-Za-z0-9_-]{43}$/, "Expected a Registry access token secret"), _c = i.object({
-  title: i.string().trim().min(1).max(80).refine(ys, { message: "Title cannot contain control characters" }),
+], xc = i.enum(Jn), Hn = i.string().regex(/^prt_[A-Za-z0-9_-]{43}$/, "Expected a Registry access token secret"), Uc = i.object({
+  title: i.string().trim().min(1).max(80).refine(vs, { message: "Title cannot contain control characters" }),
   expiresAt: i.iso.datetime({ offset: !0 }).nullable().optional(),
-  permissions: ue.default([])
-}), kc = i.object({
-  title: i.string().trim().min(1).max(80).refine(ys, { message: "Title cannot contain control characters" }).optional(),
+  permissions: pe.default([])
+}), Oc = i.object({
+  title: i.string().trim().min(1).max(80).refine(vs, { message: "Title cannot contain control characters" }).optional(),
   expiresAt: i.iso.datetime({ offset: !0 }).nullable().optional()
-}), jc = i.object({ permissions: ue });
-function ys(e) {
+}), Mc = i.object({ permissions: pe });
+function vs(e) {
   return Array.from(e).every((t) => {
     const s = t.codePointAt(0) ?? 0;
     return s > 31 && s !== 127;
   });
 }
-var Tc = i.object({ appId: g }), Z = i.object({
+var Nc = i.object({ appId: g }), te = i.object({
   id: i.string(),
   ownerId: i.string(),
   title: i.string(),
   tokenPrefix: i.string(),
-  permissions: ue,
+  permissions: pe,
   expiresAt: i.string().nullable(),
   deletedAt: i.string().nullable(),
   lastUsedAt: i.string().nullable(),
   createdAt: i.string(),
   updatedAt: i.string()
-}), bs = i.object({
+}), Rs = i.object({
   tokenId: i.string(),
   appId: g,
   grantedBy: i.string(),
   deletedAt: i.string().nullable(),
   createdAt: i.string(),
   updatedAt: i.string()
-}), Jn = i.object({
-  token: Z,
-  secret: Fn
-}), zn = i.object({
-  token: Z,
-  removedPermissions: ue.optional()
-}), Hn = i.object({ tokens: i.array(Z) }), Gn = i.object({
-  token: Z,
-  grants: i.array(bs)
-}), wt = i.object({ grant: bs }), he = i.object({
-  token: Z.optional(),
-  permissions: ue
-}), Wn = i.object({ token: Z }), Qn = class {
+}), Gn = i.object({
+  token: te,
+  secret: Hn
+}), Wn = i.object({
+  token: te,
+  removedPermissions: pe.optional()
+}), Qn = i.object({ tokens: i.array(te) }), Yn = i.object({
+  token: te,
+  grants: i.array(Rs)
+}), It = i.object({ grant: Rs }), ge = i.object({
+  token: te.optional(),
+  permissions: pe
+}), Kn = i.object({ token: te }), Xn = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   create(e) {
-    return this.transport.request("/api/tokens", Jn, {
+    return this.transport.request("/api/tokens", Gn, {
       method: "POST",
       body: e
     });
   }
   list() {
-    return this.transport.request("/api/tokens", Hn);
+    return this.transport.request("/api/tokens", Qn);
   }
   status(e) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, Gn);
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, Yn);
   }
   update(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, zn, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, Wn, {
       method: "PATCH",
       body: t
     });
   }
   listPermissions(e) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, he);
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, ge);
   }
   setPermissions(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, he, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, ge, {
       method: "PUT",
       body: t
     });
   }
   addPermissions(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, he, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, ge, {
       method: "POST",
       body: t
     });
   }
   removePermissions(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, he, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/permissions`, ge, {
       method: "DELETE",
       body: t
     });
   }
   grant(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/apps`, wt, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/apps`, It, {
       method: "POST",
       body: t
     });
   }
   ungrant(e, t) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/apps`, wt, {
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}/apps`, It, {
       method: "DELETE",
       body: t
     });
   }
   delete(e) {
-    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, Wn, { method: "DELETE" });
+    return this.transport.request(`/api/tokens/${encodeURIComponent(e)}`, Kn, { method: "DELETE" });
   }
-}, Yn = i.object({
+}, Zn = i.object({
   path: i.string().min(1),
   size: i.number().int().nonnegative(),
   contentType: i.string().min(1)
-}), $c = i.object({
+}), qc = i.object({
   appId: g.describe("Stable app identifier receiving the upload."),
-  manifest: os.partial().optional(),
-  files: i.array(Yn).min(1)
-}), Kn = i.object({
-  uploadId: We.describe("Stable upload session identifier."),
+  manifest: us.partial().optional(),
+  files: i.array(Zn).min(1)
+}), ea = i.object({
+  uploadId: Xe.describe("Stable upload session identifier."),
   expiresAt: i.iso.datetime().describe("Time the upload URLs expire."),
   files: i.array(i.object({
     path: i.string().min(1),
@@ -1212,40 +1212,40 @@ var Tc = i.object({ appId: g }), Z = i.object({
     url: i.url(),
     headers: i.record(i.string().min(1), i.string())
   }))
-}), Cc = i.object({ forceApprove: i.boolean().optional() }), Xn = i.object({
+}), Dc = i.object({ forceApprove: i.boolean().optional() }), ta = i.object({
   appId: g.describe("Stable app identifier for the completed upload."),
-  appVersionId: M.describe("Version created from the upload."),
+  appVersionId: N.describe("Version created from the upload."),
   status: i.enum(["submitted", "approved"]).describe("Initial review state for the uploaded version."),
   versionRootUrl: i.url(),
-  registryAssets: i.array(yr).default([]),
+  registryAssets: i.array(vr).default([]),
   receipt: i.object({
-    uploadId: We.describe("Stable upload session identifier."),
+    uploadId: Xe.describe("Stable upload session identifier."),
     appId: g.describe("Stable app identifier for the completed upload."),
-    appVersionId: M.describe("Version created from the upload.")
+    appVersionId: N.describe("Version created from the upload.")
   })
-}), Zn = class {
+}), sa = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   create(e) {
-    return this.transport.request("/api/uploads", Kn, {
+    return this.transport.request("/api/uploads", ea, {
       method: "POST",
       body: e
     });
   }
   complete(e, t) {
-    return this.transport.request(`/api/uploads/${encodeURIComponent(e)}/complete`, Xn, {
+    return this.transport.request(`/api/uploads/${encodeURIComponent(e)}/complete`, ta, {
       method: "POST",
       body: t
     });
   }
-}, Uc = i.object({ reason: j.optional() }), xc = i.object({ reason: j }), Mc = i.object({ reason: j }), Oc = Tn.extend({
+}, Lc = i.object({ reason: k.optional() }), Vc = i.object({ reason: k }), Bc = i.object({ reason: k }), Fc = xn.extend({
   appId: g.describe("Filter versions by stable app identifier.").optional(),
-  status: ve.describe("Filter versions by review lifecycle state.").optional(),
-  channel: N.describe("Filter versions by connected channel.").optional()
-}), vt = i.object({ appVersion: X }), ea = i.object({
-  appVersion: X.extend({ deletedAt: i.iso.datetime().describe("Time this version was deleted.") }),
+  status: Se.describe("Filter versions by review lifecycle state.").optional(),
+  channel: L.describe("Filter versions by connected channel.").optional()
+}), At = i.object({ appVersion: Z }), ra = i.object({
+  appVersion: Z.extend({ deletedAt: i.iso.datetime().describe("Time this version was deleted.") }),
   event: i.object({
     eventId: i.string().min(1).describe("Stable audit event identifier."),
     eventType: i.literal("version_deleted").describe("Audit event type for the deletion."),
@@ -1254,36 +1254,36 @@ var Tc = i.object({ appId: g }), Z = i.object({
     reason: i.string().min(1).describe("Audit reason recorded with the deletion."),
     createdAt: i.iso.datetime().describe("Time the audit event was recorded.")
   })
-}), ta = i.object({ appVersions: i.array(X) }), sa = i.object({ appVersion: X });
-var E = class extends Error {
+}), na = i.object({ appVersions: i.array(Z) }), aa = i.object({ appVersion: Z });
+var P = class extends Error {
   status;
   code;
   rawPayload;
   constructor(e) {
     super(e.message), this.name = "RegistryHttpError", this.status = e.status, this.code = e.code, this.rawPayload = e.rawPayload;
   }
-}, ws = class {
+}, Ss = class {
   registryUrl;
   token;
   tokenProvider;
   fetchImplementation;
   constructor(e = {}) {
-    this.registryUrl = vs(e.registryUrl), this.token = e.token, this.tokenProvider = e.tokenProvider, this.fetchImplementation = e.fetch ?? fetch;
+    this.registryUrl = Is(e.registryUrl), this.token = e.token, this.tokenProvider = e.tokenProvider, this.fetchImplementation = e.fetch ?? fetch;
   }
   async request(e, t, s = {}) {
     const r = await this.requestJson(e, s);
     return t.parse(r);
   }
   async requestJson(e, t = {}) {
-    const s = await this.fetchImplementation(`${this.registryUrl}${ra(e)}`, {
+    const s = await this.fetchImplementation(`${this.registryUrl}${ia(e)}`, {
       method: t.method || "GET",
       headers: await this.createHeaders(t.headers),
       body: t.body === void 0 ? void 0 : JSON.stringify(t.body)
-    }), r = s.status === 204 ? null : await na(s);
-    if (!s.ok) throw new E({
+    }), r = s.status === 204 ? null : await oa(s);
+    if (!s.ok) throw new P({
       status: s.status,
-      code: aa(r),
-      message: ia(r) || `Registry request failed: ${s.status}`,
+      code: ca(r),
+      message: da(r) || `Registry request failed: ${s.status}`,
       rawPayload: r
     });
     return r;
@@ -1297,13 +1297,13 @@ var E = class extends Error {
     };
   }
 };
-function vs(e) {
+function Is(e) {
   return (e?.trim() || "https://registry.primerlearn.dev").replace(/\/+$/, "");
 }
-function ra(e) {
+function ia(e) {
   return e.startsWith("/") ? e : `/${e}`;
 }
-async function na(e) {
+async function oa(e) {
   if ((e.headers.get("content-type") || "").includes("application/json")) return e.json();
   const t = await e.text();
   if (!t) return null;
@@ -1313,17 +1313,17 @@ async function na(e) {
     return t;
   }
 }
-function aa(e) {
+function ca(e) {
   if (!e || typeof e != "object") return null;
   const t = e;
   return typeof t.code == "string" ? t.code : typeof t.error == "string" ? t.error : null;
 }
-function ia(e) {
+function da(e) {
   if (!e || typeof e != "object") return null;
   const t = e;
   return typeof t.message == "string" ? t.message : typeof t.error == "string" ? t.error : null;
 }
-var Rs = class extends E {
+var As = class extends P {
   blockingChannelIds;
   constructor(e, t) {
     super({
@@ -1333,51 +1333,51 @@ var Rs = class extends E {
       rawPayload: e.rawPayload
     }), this.name = "RegistryVersionDeleteBlockedError", this.blockingChannelIds = t;
   }
-}, oa = class {
+}, la = class {
   transport;
   constructor(e) {
     this.transport = e;
   }
   approve(e, t = {}) {
-    return this.transport.request(`/api/versions/${encodeURIComponent(e)}/approve`, vt, {
+    return this.transport.request(`/api/versions/${encodeURIComponent(e)}/approve`, At, {
       method: "POST",
       body: t
     });
   }
   reject(e, t) {
-    return this.transport.request(`/api/versions/${encodeURIComponent(e)}/reject`, vt, {
+    return this.transport.request(`/api/versions/${encodeURIComponent(e)}/reject`, At, {
       method: "POST",
       body: t
     });
   }
   async delete(e, t) {
     try {
-      return await this.transport.request(v.versions.item(e), ea, {
+      return await this.transport.request(R.versions.item(e), ra, {
         method: "DELETE",
         body: t
       });
     } catch (s) {
-      throw s instanceof E && s.code === "version_delete_blocked_by_channel" ? new Rs(s, ca(s.rawPayload)) : s;
+      throw s instanceof P && s.code === "version_delete_blocked_by_channel" ? new As(s, ua(s.rawPayload)) : s;
     }
   }
   list(e = {}) {
     const t = new URLSearchParams();
-    e.status && t.set("status", e.status), e.channel && t.set("channel", e.channel), ns(e, t);
-    const s = e.appId, r = s ? v.apps.versions(s, t) : v.versions.collection(t);
-    return this.transport.request(r, ta);
+    e.status && t.set("status", e.status), e.channel && t.set("channel", e.channel), ds(e, t);
+    const s = e.appId, r = s ? R.apps.versions(s, t) : R.versions.collection(t);
+    return this.transport.request(r, na);
   }
   show(e) {
-    return this.transport.request(v.versions.item(e), sa);
+    return this.transport.request(R.versions.item(e), aa);
   }
 };
-function ca(e) {
+function ua(e) {
   if (!e || typeof e != "object") return [];
   const t = e.details;
   if (!t || typeof t != "object") return [];
   const s = t.blockingChannelIds;
   return Array.isArray(s) ? s.filter((r) => typeof r == "string") : [];
 }
-var Rt = class {
+var Pt = class {
   transport;
   auth;
   apps;
@@ -1390,75 +1390,75 @@ var Rt = class {
   history;
   admin;
   constructor(e = {}) {
-    this.transport = e.transport ?? new ws(e), this.auth = new Wr(this.transport), this.apps = new Fr(this.transport), this.assets = new ln(this.transport), this.uploads = new Zn(this.transport), this.versions = new oa(this.transport), this.channels = new On(this.transport), this.members = new Vn(this.transport), this.tokens = new Qn(this.transport), this.history = new Dn(this.transport), this.admin = new Nr(this.transport);
+    this.transport = e.transport ?? new Ss(e), this.auth = new Kr(this.transport), this.apps = new Hr(this.transport), this.assets = new fn(this.transport), this.uploads = new sa(this.transport), this.versions = new la(this.transport), this.channels = new Dn(this.transport), this.members = new zn(this.transport), this.tokens = new Xn(this.transport), this.history = new Bn(this.transport), this.admin = new Vr(this.transport);
   }
 };
-async function da(e, t, s = {}) {
-  return new ws({ registryUrl: e }).requestJson(t, s);
+async function pa(e, t, s = {}) {
+  return new Ss({ registryUrl: e }).requestJson(t, s);
 }
-function Ce(e, t = process.env) {
-  return vs(e.registryUrl || t.VITE_REGISTRY_URL);
+function Ue(e, t = process.env) {
+  return Is(e.registryUrl || t.VITE_REGISTRY_URL);
 }
-function z(e, t = {}) {
-  return t.request ? new Rt({
+function J(e, t = {}) {
+  return t.request ? new Pt({
     registryUrl: e,
     token: t.token,
     fetch: async (s, r) => {
       const n = new URL(String(s)), a = await t.request(e, `${n.pathname}${n.search}`, {
         method: r?.method === "GET" ? void 0 : r?.method,
-        headers: ua(r?.headers),
+        headers: ma(r?.headers),
         body: typeof r?.body == "string" ? JSON.parse(r.body) : void 0
       });
       return new Response(JSON.stringify(a), { headers: { "content-type": "application/json" } });
     }
-  }) : new Rt({
+  }) : new Pt({
     registryUrl: e,
     token: t.token
   });
 }
-function ua(e) {
+function ma(e) {
   if (!e) return;
   const t = Object.fromEntries(new Headers(e));
   return delete t["content-type"], Object.keys(t).length > 0 ? t : void 0;
 }
-function _(e) {
+function E(e) {
   return {
     json: e.json === !0,
     human(t) {
       e.json || e.write(t);
     },
     result(t) {
-      e.write(Ss(t));
+      e.write(Ps(t));
     }
   };
 }
-function k(e, t) {
+function _(e, t) {
   return t.json === !0 || e.opts().json === !0;
 }
-function Ss(e) {
+function Ps(e) {
   return JSON.stringify(e, null, 2);
 }
-function f(e, t, s) {
+function m(e, t, s) {
   if (e.json) {
     e.result(t);
     return;
   }
   e.human(s);
 }
-function Is(e, t, s = t.message) {
-  y(2), f(e, t, s);
+function Es(e, t, s = t.message) {
+  y(2), m(e, t, s);
 }
 function y(e) {
   process.exitCode = e;
 }
-function la(e, t) {
+function fa(e, t) {
   const s = e.command("auth").description("Manage Registry CLI authentication");
-  St(s, e, t), It(s, e, t), At(s, e, t), St(e, e, t), It(e, e, t), At(e, e, t);
+  Et(s, e, t), _t(s, e, t), kt(s, e, t), Et(e, e, t), _t(e, e, t), kt(e, e, t);
 }
-function St(e, t, s) {
+function Et(e, t, s) {
   e.command("login").description("Sign in through the Registry browser flow").option("-u, --registry-url <url>", "Registry URL").option("--json", "Print a machine-readable result").action(async (r) => {
-    const n = _({
-      json: k(t, r),
+    const n = E({
+      json: _(t, r),
       write: s.write
     });
     if (n.json) {
@@ -1468,38 +1468,38 @@ function St(e, t, s) {
       });
       return;
     }
-    const a = Ce({
+    const a = Ue({
       ...t.opts(),
       ...r
-    }), o = z(a, { request: s.request }), c = await o.auth.start(), d = await s.openBrowser(c.verificationUriComplete);
+    }), o = J(a, { request: s.request }), c = await o.auth.start(), d = await s.openBrowser(c.verificationUriComplete);
     s.write(d ? "Attempted to open Registry login in your browser:" : "Could not open Registry login in your browser. Open this URL manually:"), s.write(c.verificationUriComplete), s.write(`Confirm code ${c.userCode} in the browser.`);
-    const u = s.now() + c.expiresIn * 1e3;
-    for (; s.now() < u; ) {
+    const l = s.now() + c.expiresIn * 1e3;
+    for (; s.now() < l; ) {
       await s.sleep(c.interval * 1e3);
-      const l = await o.auth.poll({ deviceCode: c.deviceCode });
-      if (l.status !== "pending") {
+      const u = await o.auth.poll({ deviceCode: c.deviceCode });
+      if (u.status !== "pending") {
         await s.saveSession({
           registryUrl: a,
-          accessToken: l.accessToken,
-          refreshToken: l.refreshToken,
-          expiresAt: new Date(s.now() + l.expiresIn * 1e3).toISOString(),
-          account: l.account
-        }), s.write(`Signed in as ${l.account.email || l.account.userId}.`);
+          accessToken: u.accessToken,
+          refreshToken: u.refreshToken,
+          expiresAt: new Date(s.now() + u.expiresIn * 1e3).toISOString(),
+          account: u.account
+        }), s.write(`Signed in as ${u.account.email || u.account.userId}.`);
         return;
       }
     }
     throw new Error("Login timed out");
   });
 }
-function It(e, t, s) {
+function _t(e, t, s) {
   e.command("whoami").description("Print the current Registry identity").option("-u, --registry-url <url>", "Registry URL").option("--json", "Print a machine-readable result").action(async (r) => {
-    const n = _({
-      json: k(t, r),
+    const n = E({
+      json: _(t, r),
       write: s.write
-    }), a = Ce({
+    }), a = Ue({
       ...t.opts(),
       ...r
-    }), o = pa(t), c = process.env.REGISTRY_ACCESS_TOKEN, d = o || c, u = d ? {
+    }), o = ha(t), c = process.env.REGISTRY_ACCESS_TOKEN, d = o || c, l = d ? {
       registryUrl: a,
       accessToken: d,
       refreshToken: "",
@@ -1508,29 +1508,29 @@ function It(e, t, s) {
         userId: "access-token",
         email: null
       }
-    } : await As(a, s), l = await z(u.registryUrl, {
-      token: u.accessToken,
+    } : await _s(a, s), u = await J(l.registryUrl, {
+      token: l.accessToken,
       request: s.request
     }).auth.whoami();
     if (n.json) {
       n.result({
         status: "authenticated",
-        registryUrl: u.registryUrl,
-        account: l.account
+        registryUrl: l.registryUrl,
+        account: u.account
       });
       return;
     }
-    n.human(l.account.email || l.account.userId);
+    n.human(u.account.email || u.account.userId);
   });
 }
-function At(e, t, s) {
+function kt(e, t, s) {
   e.command("logout").description("Revoke the stored CLI session").option("-y, --yes", "Approve non-interactive session mutation").option("--json", "Print a machine-readable result").action(async (r) => {
-    const n = _({
-      json: k(t, r),
+    const n = E({
+      json: _(t, r),
       write: s.write
     });
     if (n.json && !r.yes) {
-      Is(n, {
+      Es(n, {
         status: "mutation_requires_confirmation",
         message: "Logout mutates the stored CLI session. Re-run with --yes --json to confirm.",
         nextCommand: "registry logout --yes --json"
@@ -1538,19 +1538,19 @@ function At(e, t, s) {
       return;
     }
     const a = await s.readSession();
-    a && await z(a.registryUrl, { request: s.request }).auth.revoke({ refreshToken: a.refreshToken }).catch(() => {
+    a && await J(a.registryUrl, { request: s.request }).auth.revoke({ refreshToken: a.refreshToken }).catch(() => {
     }), await s.removeSession(), n.json ? n.result({ status: "logged_out" }) : n.human("Logged out.");
   });
 }
-function pa(e) {
+function ha(e) {
   const t = e.opts().token;
   return typeof t == "string" && t.trim() ? t.trim() : void 0;
 }
-async function As(e, t) {
+async function _s(e, t) {
   const s = await t.readSession();
   if (!s || s.registryUrl !== e) throw new Error("No Registry session found. Run `registry login`.");
   if (new Date(s.expiresAt).getTime() > t.now() + 3e4) return s;
-  const r = await z(e, { request: t.request }).auth.refresh({ refreshToken: s.refreshToken }), n = {
+  const r = await J(e, { request: t.request }).auth.refresh({ refreshToken: s.refreshToken }), n = {
     registryUrl: e,
     accessToken: r.accessToken,
     refreshToken: r.refreshToken,
@@ -1559,21 +1559,21 @@ async function As(e, t) {
   };
   return await t.saveSession(n), n;
 }
-async function O(e, t, s, r, n) {
-  const a = _({
-    json: k(e, s),
+async function q(e, t, s, r, n) {
+  const a = E({
+    json: _(e, s),
     write: t.write
   });
   try {
-    const { session: o, client: c } = await ie(e, t, { tokenPolicy: n.tokenPolicy }), d = await r({
+    const { session: o, client: c } = await ce(e, t, { tokenPolicy: n.tokenPolicy }), d = await r({
       session: o,
       client: c,
       output: a
     });
-    f(a, d.payload, d.message);
+    m(a, d.payload, d.message);
   } catch (o) {
-    y(n.isUsageError?.(o) || o instanceof E && o.status >= 400 && o.status < 500 ? 2 : 1);
-    const c = n.formatError?.(o) ?? ha(o, n.defaultErrorMessage);
+    y(n.isUsageError?.(o) || o instanceof P && o.status >= 400 && o.status < 500 ? 2 : 1);
+    const c = n.formatError?.(o) ?? wa(o, n.defaultErrorMessage);
     if (a.json) {
       a.result(c);
       return;
@@ -1581,21 +1581,21 @@ async function O(e, t, s, r, n) {
     throw new Error(c.message);
   }
 }
-async function ie(e, t, s = {}) {
-  const r = Ce(e.opts()), n = s.tokenPolicy || "allow-access-token", a = ma(e), o = process.env.REGISTRY_ACCESS_TOKEN, c = n === "browser-session-only" ? void 0 : a || o, d = c ? fa(r, c, t.now()) : await As(r, t);
+async function ce(e, t, s = {}) {
+  const r = Ue(e.opts()), n = s.tokenPolicy || "allow-access-token", a = ga(e), o = process.env.REGISTRY_ACCESS_TOKEN, c = n === "browser-session-only" ? void 0 : a || o, d = c ? ya(r, c, t.now()) : await _s(r, t);
   return {
     session: d,
-    client: z(d.registryUrl, {
+    client: J(d.registryUrl, {
       token: d.accessToken,
       request: t.request
     })
   };
 }
-function ma(e) {
+function ga(e) {
   const t = e.opts().token;
   return typeof t == "string" && t.trim() ? t.trim() : void 0;
 }
-function fa(e, t, s) {
+function ya(e, t, s) {
   return {
     registryUrl: e,
     accessToken: t,
@@ -1607,13 +1607,13 @@ function fa(e, t, s) {
     }
   };
 }
-function ha(e, t) {
+function wa(e, t) {
   return {
     status: "error",
     message: e instanceof Error ? e.message : t
   };
 }
-var ga = /* @__PURE__ */ lr(((e, t) => {
+var ba = /* @__PURE__ */ fr(((e, t) => {
   var s = String, r = function() {
     return {
       isColorSupported: !1,
@@ -1661,58 +1661,58 @@ var ga = /* @__PURE__ */ lr(((e, t) => {
     };
   };
   t.exports = r(), t.exports.createColors = r;
-})), te = /* @__PURE__ */ mr(ga(), 1), b = {
-  heading: te.default.bold,
-  id: te.default.cyan,
-  success: te.default.green,
-  warning: te.default.yellow,
-  placeholder: te.default.dim
+})), re = /* @__PURE__ */ gr(ba(), 1), w = {
+  heading: re.default.bold,
+  id: re.default.cyan,
+  success: re.default.green,
+  warning: re.default.yellow,
+  placeholder: re.default.dim
 };
-function C({ columns: e, rows: t, emptyMessage: s }) {
+function x({ columns: e, rows: t, emptyMessage: s }) {
   if (t.length === 0) return s;
-  const r = t.map((a) => e.map((o) => ya(o, a))), n = e.map((a, o) => Math.max(a.header.length, ...r.map((c) => c[o]?.raw.length ?? 0)));
-  return [e.map((a, o) => b.heading(Pt(a.header, n[o], o, e))).join("  "), ...r.map((a) => a.map((o, c) => (o.color || Ps)(Pt(o.raw, n[c], c, a))).join("  "))].join(`
+  const r = t.map((a) => e.map((o) => va(o, a))), n = e.map((a, o) => Math.max(a.header.length, ...r.map((c) => c[o]?.raw.length ?? 0)));
+  return [e.map((a, o) => w.heading(jt(a.header, n[o], o, e))).join("  "), ...r.map((a) => a.map((o, c) => (o.color || ks)(jt(o.raw, n[c], c, a))).join("  "))].join(`
 `);
 }
-function Pt(e, t, s, r) {
+function jt(e, t, s, r) {
   return s === r.length - 1 ? e : e.padEnd(t);
 }
-function ya(e, t) {
+function va(e, t) {
   const s = e.value(t);
   return s && typeof s == "object" && "value" in s ? {
-    raw: Et(s.value),
-    color: s.color ?? ((r) => _t(r, e, t))
+    raw: Tt(s.value),
+    color: s.color ?? ((r) => $t(r, e, t))
   } : {
-    raw: Et(s),
-    color: (r) => _t(r, e, t)
+    raw: Tt(s),
+    color: (r) => $t(r, e, t)
   };
 }
-function Et(e) {
+function Tt(e) {
   return e == null || e === "" ? "-" : String(e);
 }
-function Ps(e) {
-  return e.trim() === "-" ? b.placeholder(e) : e;
+function ks(e) {
+  return e.trim() === "-" ? w.placeholder(e) : e;
 }
-function _t(e, t, s) {
-  return e.trim() === "-" ? Ps(e) : t.color?.(e, s) ?? e;
+function $t(e, t, s) {
+  return e.trim() === "-" ? ks(e) : t.color?.(e, s) ?? e;
 }
-function ba(e, t) {
-  wa(e, t), va(e, t);
+function Ra(e, t) {
+  Sa(e, t), Ia(e, t);
 }
-function wa(e, t) {
+function Sa(e, t) {
   const s = e.command("allowlist").description("Manage Registry CLI login allowlist entries");
   s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
-    await $(e, t, r, async ({ client: n }) => {
+    await C(e, t, r, async ({ client: n }) => {
       const a = await n.admin.listEmailAllowlistEntries();
       return {
         payload: a,
-        message: Ia(a.entries)
+        message: Ea(a.entries)
       };
     });
   }), s.command("add-email").argument("<email>", "Email address to allow").option("--description <text>", "Allowlist description").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
+    await C(e, t, n, async ({ client: a }) => {
       const o = await a.admin.createEmailAllowlistEntry({
-        entryType: Se.email,
+        entryType: Ae.email,
         value: r,
         description: n.description,
         reason: n.description || "Added email allowlist entry via CLI"
@@ -1723,9 +1723,9 @@ function wa(e, t) {
       };
     });
   }), s.command("add-domain").argument("<domain>", "Email domain to allow").option("--description <text>", "Allowlist description").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
+    await C(e, t, n, async ({ client: a }) => {
       const o = await a.admin.createEmailAllowlistEntry({
-        entryType: Se.domain,
+        entryType: Ae.domain,
         value: r,
         description: n.description,
         reason: n.description || "Added domain allowlist entry via CLI"
@@ -1736,7 +1736,7 @@ function wa(e, t) {
       };
     });
   }), s.command("disable").argument("<entry-id>", "Allowlist entry ID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
+    await C(e, t, n, async ({ client: a }) => {
       const o = await a.admin.updateEmailAllowlistEntry(r, {
         enabled: !1,
         reason: "Disabled allowlist entry via CLI"
@@ -1747,7 +1747,7 @@ function wa(e, t) {
       };
     });
   }), s.command("enable").argument("<entry-id>", "Allowlist entry ID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
+    await C(e, t, n, async ({ client: a }) => {
       const o = await a.admin.updateEmailAllowlistEntry(r, {
         enabled: !0,
         reason: "Enabled allowlist entry via CLI"
@@ -1759,31 +1759,31 @@ function wa(e, t) {
     });
   });
 }
-function va(e, t) {
+function Ia(e, t) {
   const s = e.command("users").description("Manage Registry users");
   s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
-    await $(e, t, r, async ({ client: n }) => {
+    await C(e, t, r, async ({ client: n }) => {
       const a = await n.admin.listUsers();
       return {
         payload: a,
-        message: Aa(a.users)
+        message: _a(a.users)
       };
     });
   }), s.command("show").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").option("--json", "Print a machine-readable result").action(async (r) => {
-    await $(e, t, r, async ({ client: n }) => {
-      ge(r);
+    await C(e, t, r, async ({ client: n }) => {
+      ye(r);
       const a = r.userId ? await n.admin.getUser(r.userId) : await n.admin.getUserByEmail(r.email);
       return {
         payload: a,
-        message: Pa(a.user)
+        message: ka(a.user)
       };
     });
-  }), s.command("grant-permissions").argument("[permissions...]", "Concrete permissions to grant").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").option("--preset <preset>", `Permission preset to grant: ${ne.join(", ")}`).requiredOption("--reason <text>", "Permission grant reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
-      ge(n), kt(n.preset);
-      const o = jt(r);
+  }), s.command("grant-permissions").argument("[permissions...]", "Concrete permissions to grant").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").option("--preset <preset>", `Permission preset to grant: ${ae.join(", ")}`).requiredOption("--reason <text>", "Permission grant reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
+    await C(e, t, n, async ({ client: a }) => {
+      ye(n), Ct(n.preset);
+      const o = xt(r);
       if (o.length === 0 && !n.preset) throw new Q("Grant at least one permission or --preset");
-      const c = await Ne(n, a.admin), d = await a.admin.updateUserPermissions(c, {
+      const c = await Le(n, a.admin), d = await a.admin.updateUserPermissions(c, {
         grantPermissions: o,
         grantPreset: n.preset,
         reason: n.reason
@@ -1793,12 +1793,12 @@ function va(e, t) {
         message: `Granted permissions to ${d.user.id}.`
       };
     });
-  }), s.command("revoke-permissions").argument("[permissions...]", "Concrete permissions to revoke").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").option("--preset <preset>", `Permission preset to revoke: ${ne.join(", ")}`).requiredOption("--reason <text>", "Permission revocation reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await $(e, t, n, async ({ client: a }) => {
-      ge(n), kt(n.preset);
-      const o = jt(r);
+  }), s.command("revoke-permissions").argument("[permissions...]", "Concrete permissions to revoke").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").option("--preset <preset>", `Permission preset to revoke: ${ae.join(", ")}`).requiredOption("--reason <text>", "Permission revocation reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
+    await C(e, t, n, async ({ client: a }) => {
+      ye(n), Ct(n.preset);
+      const o = xt(r);
       if (o.length === 0 && !n.preset) throw new Q("Revoke at least one permission or --preset");
-      const c = await Ne(n, a.admin), d = await a.admin.updateUserPermissions(c, {
+      const c = await Le(n, a.admin), d = await a.admin.updateUserPermissions(c, {
         revokePermissions: o,
         revokePreset: n.preset,
         reason: n.reason
@@ -1809,9 +1809,9 @@ function va(e, t) {
       };
     });
   }), s.command("revoke-sessions").option("--email <email>", "Find a user by email").option("--user-id <user-id>", "Find a user by durable user ID").requiredOption("--reason <text>", "Session revocation reason").option("--json", "Print a machine-readable result").action(async (r) => {
-    await $(e, t, r, async ({ client: n }) => {
-      ge(r);
-      const a = await Ne(r, n.admin), o = await n.admin.revokeUserSessions(a, { reason: r.reason });
+    await C(e, t, r, async ({ client: n }) => {
+      ye(r);
+      const a = await Le(r, n.admin), o = await n.admin.revokeUserSessions(a, { reason: r.reason });
       return {
         payload: o,
         message: `Revoked ${o.revokedSessionCount} session(s) for ${o.userId}.`
@@ -1819,45 +1819,45 @@ function va(e, t) {
     });
   });
 }
-async function $(e, t, s, r) {
-  await O(e, t, s, r, {
+async function C(e, t, s, r) {
+  await q(e, t, s, r, {
     defaultErrorMessage: "Registry admin command failed",
-    formatError: Ra,
-    isUsageError: _a
+    formatError: Aa,
+    isUsageError: Ta
   });
 }
-function Ra(e) {
-  return e instanceof E ? {
-    status: Sa(e),
+function Aa(e) {
+  return e instanceof P ? {
+    status: Pa(e),
     message: e.message
   } : {
     status: "error",
     message: e instanceof Error ? e.message : "Registry admin command failed"
   };
 }
-function Sa(e) {
+function Pa(e) {
   return e.code === "validation_failed" || e.status === 400 ? "validation_failed" : e.code === "forbidden" || e.status === 403 ? "permission_denied" : e.code === "unauthorized" || e.status === 401 ? "unauthorized" : e.code === "user_not_found" || e.status === 404 ? "user_not_found" : e.code === "email_allowlist_entry_not_found" ? "email_allowlist_entry_not_found" : e.code === "email_allowlist_entry_already_exists" ? "email_allowlist_entry_already_exists" : e.code === "last_admin_required" ? "last_admin_required" : "error";
 }
-function ge(e) {
+function ye(e) {
   if (e.email && e.userId) throw new Q("Provide either --email or --user-id, not both");
   if (!e.email && !e.userId) throw new Q("Provide a user selector with --email or --user-id");
 }
-function kt(e) {
-  if (e && !ne.includes(e)) throw new Q(`Preset must be one of: ${ne.join(", ")}`);
+function Ct(e) {
+  if (e && !ae.includes(e)) throw new Q(`Preset must be one of: ${ae.join(", ")}`);
 }
-function jt(e) {
-  return e.length === 0 ? [] : Xt(e);
+function xt(e) {
+  return e.length === 0 ? [] : rs(e);
 }
-async function Ne(e, t) {
+async function Le(e, t) {
   return e.userId ? e.userId : (await t.getUserByEmail(e.email)).user.id;
 }
-function Ia(e) {
-  return C({
+function Ea(e) {
+  return x({
     columns: [
       {
         header: "ENTRY ID",
         value: (t) => t.id,
-        color: b.id
+        color: w.id
       },
       {
         header: "TYPE",
@@ -1870,7 +1870,7 @@ function Ia(e) {
       {
         header: "STATUS",
         value: (t) => t.disabledAt ? "disabled" : "enabled",
-        color: Ea
+        color: ja
       },
       {
         header: "DESCRIPTION",
@@ -1881,13 +1881,13 @@ function Ia(e) {
     emptyMessage: "No allowlist entries found."
   });
 }
-function Aa(e) {
-  return C({
+function _a(e) {
+  return x({
     columns: [
       {
         header: "USER ID",
         value: (t) => t.id,
-        color: b.id
+        color: w.id
       },
       {
         header: "EMAIL",
@@ -1902,24 +1902,24 @@ function Aa(e) {
     emptyMessage: "No users found."
   });
 }
-function Pa(e) {
+function ka(e) {
   return [
     e.id,
     e.email || "",
     e.permissions.join(",")
   ].join("	");
 }
-function Ea(e) {
-  return e.trim() === "enabled" ? b.success(e) : b.warning(e);
+function ja(e) {
+  return e.trim() === "enabled" ? w.success(e) : w.warning(e);
 }
 var Q = class extends Error {
 };
-function _a(e) {
+function Ta(e) {
   return e instanceof Q;
 }
-var ka = "@superbuilders/primer-tives", ja = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
-async function Ta(e) {
-  return cs(await I(e, "utf8"));
+var $a = "@superbuilders/primer-tives", Ca = /^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
+async function xa(e) {
+  return an(await I(e, "utf8"));
 }
 async function Y(e) {
   const t = await I(e, "utf8");
@@ -1931,32 +1931,29 @@ async function Y(e) {
   }
   if (!s || typeof s != "object" || Array.isArray(s)) throw new Error("manifest.json must be a JSON object");
   return {
-    manifest: $e(s),
+    manifest: xe(s),
     document: s
   };
 }
-async function $a(e) {
-  return cs(await I(e, "utf8"));
-}
-async function J(e, t) {
-  await Ge(e, `${JSON.stringify(t, null, 2)}
+async function z(e, t) {
+  await Ke(e, `${JSON.stringify(t, null, 2)}
 `);
 }
-function Es(e) {
-  return fr(e);
+function js(e) {
+  return yr(e);
 }
-async function nt(e) {
+async function ct(e) {
   let t;
   try {
-    t = JSON.parse(await I(x(e, "package.json"), "utf8"));
+    t = JSON.parse(await I(B(e, "package.json"), "utf8"));
   } catch (r) {
-    if (Ua(r)) return null;
+    if (Oa(r)) return null;
     throw r;
   }
-  const s = Ca(t, ka);
-  return s && ja.test(s) ? s : null;
+  const s = Ua(t, $a);
+  return s && Ca.test(s) ? s : null;
 }
-function Ca(e, t) {
+function Ua(e, t) {
   if (!e || typeof e != "object") return null;
   for (const s of [
     "dependencies",
@@ -1971,34 +1968,34 @@ function Ca(e, t) {
   }
   return null;
 }
-function Ua(e) {
+function Oa(e) {
   return e instanceof Error && "code" in e && e.code === "ENOENT";
 }
-function q(e = {}) {
-  const t = T(e.cwd ?? process.cwd(), e.root ?? "."), s = Tt(t, e.manifest ?? "manifest.json"), r = Tt(t, e.dist ?? "dist");
+function D(e = {}) {
+  const t = T(e.cwd ?? process.cwd(), e.root ?? "."), s = Ut(t, e.manifest ?? "manifest.json"), r = Ut(t, e.dist ?? "dist");
   return {
     root: t,
     sourceManifest: s,
     artifactDirectory: r,
-    artifactManifest: T(r, Yr),
-    artifactEntrypoint: T(r, Qr)
+    artifactManifest: T(r, ve),
+    artifactEntrypoint: T(r, Xr)
   };
 }
-function Tt(e, t) {
-  return Je(t) ? T(t) : T(e, t);
+function Ut(e, t) {
+  return He(t) ? T(t) : T(e, t);
 }
-async function _s(e, t) {
-  const s = q({
+async function Ts(e, t) {
+  const s = D({
     root: e.root,
     manifest: e.manifest
-  }), r = await ks(s.sourceManifest), n = [];
+  }), r = await $s(s.sourceManifest), n = [];
   let a = {};
   if (r) try {
     a = { ...(await Y(s.sourceManifest)).document };
-  } catch (u) {
-    if (e.json) throw u;
-    if (a = { ...await Ma(s.sourceManifest) }, typeof a.title != "string" || a.title.trim() === "") delete a.title;
-    else throw u;
+  } catch (l) {
+    if (e.json) throw l;
+    if (a = { ...await Na(s.sourceManifest) }, typeof a.title != "string" || a.title.trim() === "") delete a.title;
+    else throw l;
   }
   if (typeof a.title != "string" || a.title.trim() === "") {
     if (e.json)
@@ -2016,8 +2013,8 @@ async function _s(e, t) {
         diagnostics: n,
         nextCommands: [`registry init${e.manifest ? ` --manifest ${e.manifest}` : ""}`]
       };
-    const u = await t.promptText("App title?");
-    if (!u.trim())
+    const l = await t.promptText("App title?");
+    if (!l.trim())
       return n.push("Manifest title is required."), {
         status: "cancelled",
         manifestPath: s.sourceManifest,
@@ -2027,13 +2024,13 @@ async function _s(e, t) {
         diagnostics: n,
         nextCommands: []
       };
-    a.title = u.trim();
+    a.title = l.trim();
   }
   Array.isArray(a.tags) || (a.tags = []);
   const o = {};
-  if ((typeof a.appId != "string" || a.appId.trim() === "") && (o.appId = Es(String(a.title))), a.primerSdkVersion === void 0 || a.primerSdkVersion === null) {
-    const u = await nt(s.root);
-    u && (o.primerSdkVersion = u);
+  if ((typeof a.appId != "string" || a.appId.trim() === "") && (o.appId = js(String(a.title))), a.primerSdkVersion === void 0 || a.primerSdkVersion === null) {
+    const l = await ct(s.root);
+    l && (o.primerSdkVersion = l);
   }
   const c = {
     ...a,
@@ -2049,7 +2046,7 @@ async function _s(e, t) {
     diagnostics: n,
     nextCommands: d
   };
-  if (t.write(Oa(s.sourceManifest, c, s.artifactDirectory)), Object.keys(o).length === 0 && r)
+  if (t.write(qa(s.sourceManifest, c, s.artifactDirectory)), Object.keys(o).length === 0 && r)
     return t.write("Manifest is already initialized."), e.suppressFinalClaimPrompt || t.write("Next: registry claim"), {
       status: "unchanged",
       manifestPath: s.sourceManifest,
@@ -2071,8 +2068,8 @@ async function _s(e, t) {
       diagnostics: n,
       nextCommands: []
     };
-  if (await J(s.sourceManifest, c), t.write(`Wrote ${s.sourceManifest}.`), !e.suppressFinalClaimPrompt) {
-    const u = await t.confirm("Claim this app now?", { defaultValue: !1 });
+  if (await z(s.sourceManifest, c), t.write(`Wrote ${s.sourceManifest}.`), !e.suppressFinalClaimPrompt) {
+    const l = await t.confirm("Claim this app now?", { defaultValue: !1 });
     t.write("Next: registry claim");
   }
   return {
@@ -2087,13 +2084,13 @@ async function _s(e, t) {
     nextCommands: d
   };
 }
-async function xa(e, t) {
-  return ks(q({
+async function Ma(e, t) {
+  return $s(D({
     root: e,
     manifest: t
   }).sourceManifest);
 }
-async function Ma(e) {
+async function Na(e) {
   const { readFile: t } = await import("node:fs/promises");
   let s;
   try {
@@ -2104,45 +2101,45 @@ async function Ma(e) {
   if (!s || typeof s != "object" || Array.isArray(s)) throw new Error("manifest.json must be a JSON object");
   return s;
 }
-async function ks(e) {
+async function $s(e) {
   try {
-    return await Vt(e), !0;
+    return await Ht(e), !0;
   } catch (t) {
     if (t instanceof Error && "code" in t && t.code === "ENOENT") return !1;
     throw t;
   }
 }
-function Oa(e, t, s) {
+function qa(e, t, s) {
   return `Registry manifest preview
 
 Path: ${e}
 
-${Ss(t)}
+${Ps(t)}
 
 Expected build output:
   ${s}/index.html
   ${s}/manifest.json`;
 }
-function qa(e, t) {
-  js(e.command("claim"), e, t);
+function Da(e, t) {
+  Cs(e.command("claim"), e, t);
 }
-function Na(e, t, s) {
-  js(e.command("claim"), t, s);
+function La(e, t, s) {
+  Cs(e.command("claim"), t, s);
 }
-function js(e, t, s) {
+function Cs(e, t, s) {
   e.argument("[root]", "Primer app project root", ".").description("Claim a Primer app ID in the Registry").option("-m, --manifest <path>", "Source manifest path").option("--dry-run", "Validate claim readiness without creating Registry state").option("-y, --yes", "Approve non-interactive claim creation").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    const a = _({
-      json: k(t, n),
+    const a = E({
+      json: _(t, n),
       write: s.write
     });
     try {
-      const o = q({
+      const o = D({
         root: r,
         manifest: n.manifest
       });
-      if (!await xa(r, n.manifest)) {
+      if (!await Ma(r, n.manifest)) {
         if (a.json || n.dryRun) {
-          y(2), f(a, {
+          y(2), m(a, {
             status: "needs_init",
             message: "No source manifest found. Run registry init before claiming this app.",
             nextCommand: "registry init --json"
@@ -2153,12 +2150,12 @@ function js(e, t, s) {
           a.human("Claim cancelled.");
           return;
         }
-        const R = await _s({
+        const $ = await Ts({
           root: r,
           manifest: n.manifest,
           suppressFinalClaimPrompt: !0
         }, s);
-        if (R.status !== "initialized" && R.status !== "unchanged") {
+        if ($.status !== "initialized" && $.status !== "unchanged") {
           a.human("Claim cancelled.");
           return;
         }
@@ -2167,69 +2164,69 @@ function js(e, t, s) {
           return;
         }
       }
-      const { client: c } = await ie(t, s), { manifest: d, document: u } = await Y(o.sourceManifest), l = d.appId || Es(d.title), p = await Va(o.root, u);
+      const { client: c } = await ce(t, s), { manifest: d, document: l } = await Y(o.sourceManifest), u = d.appId || js(d.title), p = await Fa(o.root, l);
       if (!d.appId && (a.json || n.dryRun)) {
-        y(2), f(a, {
+        y(2), m(a, {
           status: "needs_manifest_update",
           manifestPath: o.sourceManifest,
-          suggestedFields: $t(l, p),
+          suggestedFields: Ot(u, p),
           message: "Update manifest.json, then rerun registry claim."
         }, "Update manifest.json, then rerun registry claim.");
         return;
       }
-      const m = await c.apps.availability(l);
-      if (m.exists || !m.available) {
+      const h = await c.apps.availability(u);
+      if (h.exists || !h.available) {
         if (!n.dryRun) {
-          const R = await La(c, l);
-          if (R?.exists && "claim" in R && R.claim.claimedByCurrentUser) {
-            f(a, {
+          const $ = await Ba(c, u);
+          if ($?.exists && "claim" in $ && $.claim.claimedByCurrentUser) {
+            m(a, {
               status: "already_claimed",
-              appId: l
-            }, `App ${l} is already claimed by this account.`);
+              appId: u
+            }, `App ${u} is already claimed by this account.`);
             return;
           }
         }
-        y(3), f(a, {
+        y(3), m(a, {
           status: "app_id_unavailable",
-          appId: l,
+          appId: u,
           message: "Edit manifest.json with a different appId, then rerun registry claim."
-        }, `App ID ${l} is unavailable. Edit manifest.json with a different appId, then rerun registry claim.`);
+        }, `App ID ${u} is unavailable. Edit manifest.json with a different appId, then rerun registry claim.`);
         return;
       }
       if (n.dryRun) {
-        f(a, {
+        m(a, {
           status: "claim_ready",
-          appId: l,
+          appId: u,
           available: !0,
           exists: !1
-        }, `App ID ${l} is available to claim.`);
+        }, `App ID ${u} is available to claim.`);
         return;
       }
       if (a.json && !n.yes) {
-        Is(a, {
+        Es(a, {
           status: "claim_requires_confirmation",
-          appId: l,
+          appId: u,
           nextCommand: `registry claim ${r} --yes --json`,
           message: "Claiming this app creates Registry state. Re-run with --yes to confirm."
         });
         return;
       }
-      if (!a.json && !n.yes && (a.human(Da(d, l)), !await s.confirm("Create app?", { defaultValue: !0 }))) {
+      if (!a.json && !n.yes && (a.human(Va(d, u)), !await s.confirm("Create app?", { defaultValue: !0 }))) {
         a.human("Claim cancelled.");
         return;
       }
-      const A = await c.apps.create({
-        appId: l,
+      const b = await c.apps.create({
+        appId: u,
         title: d.title
       });
-      d.appId || await J(o.sourceManifest, {
-        ...u,
-        ...$t(A.appId, p)
-      }), f(a, {
+      d.appId || await z(o.sourceManifest, {
+        ...l,
+        ...Ot(b.appId, p)
+      }), m(a, {
         status: "claimed",
-        appId: A.appId,
-        created: A.created
-      }, `Claimed app ${A.appId}.`);
+        appId: b.appId,
+        created: b.created
+      }, `Claimed app ${b.appId}.`);
     } catch (o) {
       if (y(1), a.json) {
         a.result({
@@ -2242,41 +2239,41 @@ function js(e, t, s) {
     }
   });
 }
-function Da(e, t) {
+function Va(e, t) {
   return `Create new app?
 
 Title: ${e.title}
 App ID: ${t}`;
 }
-function $t(e, t) {
+function Ot(e, t) {
   return t ? {
     appId: e,
     primerSdkVersion: t
   } : { appId: e };
 }
-async function La(e, t) {
+async function Ba(e, t) {
   try {
     return await e.apps.get(t);
   } catch {
     return null;
   }
 }
-async function Va(e, t) {
-  return t.primerSdkVersion !== void 0 && t.primerSdkVersion !== null ? null : nt(e);
+async function Fa(e, t) {
+  return t.primerSdkVersion !== void 0 && t.primerSdkVersion !== null ? null : ct(e);
 }
 function K(e) {
   return e.some((t) => t.severity === "error");
 }
 function fe(e) {
-  return e.map(Ba).join(`
+  return e.map(za).join(`
 `);
 }
-function Ba(e) {
+function za(e) {
   const t = e.target ? ` (${e.target})` : "", s = e.nextCommand ? ` Run: ${e.nextCommand}` : "";
   return `${e.severity}: ${e.message}${t}${s}`;
 }
-async function at(e = {}) {
-  const t = q({
+async function dt(e = {}) {
+  const t = D({
     cwd: e.cwd,
     root: e.root,
     manifest: e.manifest
@@ -2286,14 +2283,14 @@ async function at(e = {}) {
     appId: e.appId,
     diagnostics: []
   };
-  const s = [], r = await Fa(t.sourceManifest, s);
+  const s = [], r = await Ja(t.sourceManifest, s);
   if (!r) return {
     paths: t,
     appId: null,
     diagnostics: s
   };
   try {
-    const n = $e(r);
+    const n = xe(r);
     if (n.appId) return {
       paths: t,
       appId: n.appId,
@@ -2322,12 +2319,12 @@ async function at(e = {}) {
     diagnostics: s
   };
 }
-async function Fa(e, t) {
+async function Ja(e, t) {
   let s;
   try {
     s = await I(e, "utf8");
   } catch (r) {
-    if (Ja(r))
+    if (Ha(r))
       return t.push({
         code: "manifest_missing",
         severity: "error",
@@ -2350,41 +2347,41 @@ async function Fa(e, t) {
     }), null;
   }
 }
-function Ja(e) {
+function Ha(e) {
   return e instanceof Error && "code" in e && e.code === "ENOENT";
 }
-function za(e, t) {
+function Ga(e, t) {
   e.command("history").description("List app-scoped Registry history").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root").option("--json", "Print a machine-readable result").action(async (s) => {
-    await Ue(e, t, s, async ({ client: r }) => {
-      const n = await Ts(s);
-      return xe({
+    await Oe(e, t, s, async ({ client: r }) => {
+      const n = await xs(s);
+      return Me({
         appId: n,
         events: (await r.history.app(n)).events
       });
     });
   });
 }
-function Ha(e, t, s) {
+function Wa(e, t, s) {
   e.command("history").argument("<app-id>", "Registry app ID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await Ue(t, s, n, async ({ client: a }) => xe({
+    await Oe(t, s, n, async ({ client: a }) => Me({
       appId: r,
       events: (await a.history.app(r)).events
     }));
   });
 }
-function Ga(e, t, s) {
+function Qa(e, t, s) {
   e.command("history").argument("<version-id>", "App version UUID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await Ue(t, s, n, async ({ client: a }) => xe({
+    await Oe(t, s, n, async ({ client: a }) => Me({
       versionId: r,
       events: (await a.history.version(r)).events
     }));
   });
 }
-function Wa(e, t, s) {
+function Ya(e, t, s) {
   e.command("history").argument("<channel-id>", "Distribution channel ID").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await Ue(t, s, n, async ({ client: a }) => {
-      const o = await Ts(n);
-      return xe({
+    await Oe(t, s, n, async ({ client: a }) => {
+      const o = await xs(n);
+      return Me({
         appId: o,
         channelId: r,
         events: (await a.history.channel(r, { appId: o })).events
@@ -2392,78 +2389,78 @@ function Wa(e, t, s) {
     });
   });
 }
-async function Ue(e, t, s, r) {
-  await O(e, t, s, r, {
+async function Oe(e, t, s, r) {
+  await q(e, t, s, r, {
     defaultErrorMessage: "Registry history command failed",
-    formatError: Ya,
-    isUsageError: Qa
+    formatError: Xa,
+    isUsageError: Ka
   });
 }
-async function Ts(e) {
-  if (!e.appId && !e.root) throw new it("Provide an app context with --app-id or --root");
-  const t = await at({
+async function xs(e) {
+  if (!e.appId && !e.root) throw new lt("Provide an app context with --app-id or --root");
+  const t = await dt({
     appId: e.appId,
     root: e.root
   });
   if (t.appId && !K(t.diagnostics)) return t.appId;
   throw new Error(fe(t.diagnostics) || "Unable to resolve Registry app ID");
 }
-function xe(e) {
+function Me(e) {
   return {
     payload: {
       status: "history_listed",
       ...e
     },
-    message: Xa(e.events)
+    message: ei(e.events)
   };
 }
-var it = class extends Error {
+var lt = class extends Error {
 };
-function Qa(e) {
-  return e instanceof it;
+function Ka(e) {
+  return e instanceof lt;
 }
-function Ya(e) {
-  return e instanceof it ? {
+function Xa(e) {
+  return e instanceof lt ? {
     status: "app_id_required",
     message: e.message
-  } : e instanceof E ? {
-    status: Ka(e),
+  } : e instanceof P ? {
+    status: Za(e),
     message: e.message
   } : {
     status: "error",
     message: e instanceof Error ? e.message : "Registry history command failed"
   };
 }
-function Ka(e) {
+function Za(e) {
   return e.code === "permission_denied" || e.status === 403 ? "permission_denied" : e.code === "history_not_found" || e.status === 404 ? "history_not_found" : "error";
 }
-function Xa(e) {
-  return e.length === 0 ? "No history events found." : e.map(Za).join(`
+function ei(e) {
+  return e.length === 0 ? "No history events found." : e.map(ti).join(`
 `);
 }
-function Za(e) {
-  const t = e.actorEmail ?? e.actorUserId ?? "system", s = ei(e), r = e.reason ? ` - ${e.reason}` : "";
+function ti(e) {
+  const t = e.actorEmail ?? e.actorUserId ?? "system", s = si(e), r = e.reason ? ` - ${e.reason}` : "";
   return `${e.createdAt}	${e.eventType}	${s}	${t}${r}`;
 }
-function ei(e) {
+function si(e) {
   return e.channelId ? `${e.appId}/${e.channelId}` : e.appVersionId ? `${e.appId}/${e.appVersionId}` : e.appId;
 }
-function ti(e, t) {
+function ri(e, t) {
   const s = e.command("apps").description("Inspect Registry apps");
-  Na(s, e, t), Ha(s, e, t), s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
-    await O(e, t, r, async ({ client: n }) => {
+  La(s, e, t), Wa(s, e, t), s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
+    await q(e, t, r, async ({ client: n }) => {
       const a = await n.apps.list();
       return {
         payload: {
           status: "apps_listed",
           apps: a.apps
         },
-        message: ri(a.apps)
+        message: ai(a.apps)
       };
     }, { defaultErrorMessage: "Registry apps command failed" });
   }), s.command("delete").argument("<app-id>", "Registry app ID").requiredOption("--reason <text>", "Deletion reason").option("--force", "Hard delete an already-soft-deleted app (unsupported)").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await O(e, t, n, async ({ client: a }) => {
-      if (n.force) throw new $s("Hard delete is deferred; omit --force to soft-delete the app");
+    await q(e, t, n, async ({ client: a }) => {
+      if (n.force) throw new Us("Hard delete is deferred; omit --force to soft-delete the app");
       const o = await a.apps.delete(r, { reason: n.reason });
       return {
         payload: {
@@ -2474,23 +2471,23 @@ function ti(e, t) {
       };
     }, {
       defaultErrorMessage: "Registry apps command failed",
-      formatError: ii,
-      isUsageError: ai
+      formatError: ci,
+      isUsageError: oi
     });
   }), s.command("show").argument("<app-id>", "Registry app ID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await O(e, t, n, async ({ client: a }) => {
+    await q(e, t, n, async ({ client: a }) => {
       const o = await a.apps.get(r);
       return {
         payload: {
           status: "app_shown",
           app: o
         },
-        message: si(o)
+        message: ni(o)
       };
     }, { defaultErrorMessage: "Registry apps command failed" });
   });
 }
-function si(e) {
+function ni(e) {
   if (!e.exists) return `${e.appId}
 Status: available`;
   if (e.deletedAt) return `${e.appId}
@@ -2500,13 +2497,13 @@ Deleted at: ${e.deletedAt}`;
   return `${e.appId}
 Status: ${t}`;
 }
-function ri(e) {
-  return C({
+function ai(e) {
+  return x({
     columns: [
       {
         header: "APP ID",
         value: (t) => t.appId,
-        color: b.id
+        color: w.id
       },
       {
         header: "VISIBILITY",
@@ -2515,38 +2512,58 @@ function ri(e) {
       {
         header: "STATUS",
         value: (t) => t.status,
-        color: ni
+        color: ii
       },
       {
         header: "LATEST VERSION ID",
         value: (t) => t.latestVersionId,
-        color: b.id
+        color: w.id
       }
     ],
     rows: e,
     emptyMessage: "No apps found."
   });
 }
-function ni(e) {
-  return e.trim() === "active" ? b.success(e) : b.warning(e);
-}
-var $s = class extends Error {
-};
-function ai(e) {
-  return e instanceof $s;
-}
 function ii(e) {
+  return e.trim() === "active" ? w.success(e) : w.warning(e);
+}
+var Us = class extends Error {
+};
+function oi(e) {
+  return e instanceof Us;
+}
+function ci(e) {
   return {
     status: "error",
     message: e instanceof Error ? e.message : "Registry apps command failed"
   };
 }
-var De = 1024 * 1024, qc = {
+var Ve = 1024 * 1024, Mt = {
   maxVersionFiles: 1e3,
-  maxVersionBytes: 250 * De,
-  maxFileBytes: 50 * De,
-  maxThumbnailBytes: 10 * De
-}, oi = /* @__PURE__ */ new Map([
+  maxVersionBytes: 250 * Ve,
+  maxFileBytes: 50 * Ve,
+  maxThumbnailBytes: 10 * Ve
+}, di = /* @__PURE__ */ new Map([
+  [".html", /* @__PURE__ */ new Set(["text/html"])],
+  [".js", /* @__PURE__ */ new Set([
+    "text/javascript",
+    "application/javascript",
+    "application/x-javascript"
+  ])],
+  [".mjs", /* @__PURE__ */ new Set(["text/javascript", "application/javascript"])],
+  [".css", /* @__PURE__ */ new Set(["text/css"])],
+  [".json", /* @__PURE__ */ new Set(["application/json"])],
+  [".png", /* @__PURE__ */ new Set(["image/png"])],
+  [".jpg", /* @__PURE__ */ new Set(["image/jpeg"])],
+  [".jpeg", /* @__PURE__ */ new Set(["image/jpeg"])],
+  [".webp", /* @__PURE__ */ new Set(["image/webp"])],
+  [".gif", /* @__PURE__ */ new Set(["image/gif"])],
+  [".svg", /* @__PURE__ */ new Set(["image/svg+xml"])],
+  [".avif", /* @__PURE__ */ new Set(["image/avif"])],
+  [".mp4", /* @__PURE__ */ new Set(["video/mp4"])],
+  [".wasm", /* @__PURE__ */ new Set(["application/wasm"])],
+  [".txt", /* @__PURE__ */ new Set(["text/plain"])]
+]), li = /* @__PURE__ */ new Map([
   [".html", "text/html; charset=utf-8"],
   [".js", "text/javascript; charset=utf-8"],
   [".mjs", "text/javascript; charset=utf-8"],
@@ -2559,36 +2576,109 @@ var De = 1024 * 1024, qc = {
   [".gif", "image/gif"],
   [".svg", "image/svg+xml"],
   [".avif", "image/avif"],
+  [".mp4", "video/mp4"],
   [".wasm", "application/wasm"],
   [".txt", "text/plain; charset=utf-8"]
 ]);
-function Ie(e) {
-  return oi.get(ci(e)) ?? "application/octet-stream";
+function X(e) {
+  return li.get(Os(e)) ?? "application/octet-stream";
 }
-function ci(e) {
+function ui(e) {
+  return e?.split(";")[0]?.trim().toLowerCase() || "";
+}
+function Os(e) {
   const t = e.split("/").pop() || "", s = t.lastIndexOf(".");
   return s > 0 ? t.slice(s).toLowerCase() : "";
 }
-function di(e, t) {
+async function We(e, t) {
+  const s = /* @__PURE__ */ new Set(), r = [], n = [], a = /* @__PURE__ */ new Set();
+  for (const o of t) {
+    if (!o.source) continue;
+    const c = ie(o.source, `registryAssets.${o.id}.source`);
+    c.kind === "artifactPath" && a.add(c.path);
+  }
+  for (const o of t) {
+    if (!o.source) {
+      n.push(o);
+      continue;
+    }
+    const c = ie(o.source, `registryAssets.${o.id}.source`);
+    if (c.kind === "httpsUrl") {
+      const u = await pi(o.id, c.url), p = mi(a, o.id, u.extension);
+      n.push({
+        ...o,
+        source: p
+      }), r.push({
+        kind: "remote",
+        bytes: u.bytes,
+        uploadPath: yt(p),
+        size: u.bytes.byteLength,
+        contentType: u.contentType
+      });
+      continue;
+    }
+    if (n.push(o), s.has(c.path)) continue;
+    s.add(c.path);
+    const d = T(e, c.path), l = await Ee(d);
+    r.push({
+      kind: "local",
+      path: d,
+      uploadPath: yt(c.path),
+      size: l.size,
+      contentType: X(c.path)
+    });
+  }
+  return {
+    assets: n,
+    files: r
+  };
+}
+async function pi(e, t) {
+  const s = Os(new URL(t).pathname), r = s ? di.get(s) : void 0;
+  if (!s || !r) throw new Error(`Registry asset HTTPS source for ${e} must use a supported file extension: ${t}`);
+  const n = await fetch(t);
+  if (!n.ok) throw new Error(`Registry asset HTTPS source fetch failed for ${e}: ${t} (${n.status})`);
+  const a = n.headers.get("content-length");
+  if (a) {
+    const d = Number(a);
+    if (Number.isFinite(d) && d > Mt.maxFileBytes) throw new Error(`Registry asset HTTPS source exceeds maximum byte size for ${e}: ${t}`);
+  }
+  const o = ui(n.headers.get("content-type") ?? void 0);
+  if (o && !r.has(o)) throw new Error(`Registry asset HTTPS source has unsupported content type for ${e}: ${o}`);
+  const c = new Uint8Array(await n.arrayBuffer());
+  if (c.byteLength > Mt.maxFileBytes) throw new Error(`Registry asset HTTPS source exceeds maximum byte size for ${e}: ${t}`);
+  return {
+    bytes: c,
+    extension: s,
+    contentType: X(`asset${s}`)
+  };
+}
+function mi(e, t, s) {
+  const r = t.replace(/[^a-zA-Z0-9._-]/g, "-") || "asset";
+  let n = `remote/${r}${s}`;
+  for (let a = 2; e.has(n); a += 1) n = `remote/${r}-${a}${s}`;
+  return ee(n, "registryAssets.source"), e.add(n), n;
+}
+function fi(e, t) {
   const s = e.command("assets").description("Manage reusable Registry asset manifest declarations");
   s.command("sync").argument("[root]", "Package root", ".").option("--check", "Verify Registry asset URLs are current without uploading or writing").option("-g, --generate-typescript", "Generate synced Registry asset TypeScript helper").option("--out <path>", "Generated TypeScript helper output path").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    const a = _({
-      json: k(e, n),
+    const a = E({
+      json: _(e, n),
       write: t.write
     });
     try {
       if (n.out && !n.generateTypescript) throw new Error("--out requires --generate-typescript");
-      const o = q({ root: r }), { manifest: c } = await Y(o.sourceManifest);
+      const o = D({ root: r }), { manifest: c } = await Y(o.sourceManifest);
       if (!c.appId) throw new Error("Source manifest must include appId before syncing assets.");
-      const d = g.parse(c.appId), u = await li(o.root, o.sourceManifest), l = Ct(u);
-      pi(l);
-      const p = Ri(o.root, n.out ?? c.registryAssetsModule);
-      if (l.length === 0) {
+      const d = g.parse(c.appId), l = await gi(o.root, o.sourceManifest), u = Nt(l);
+      yi(u);
+      const p = Pi(o.root, n.out ?? c.registryAssetsModule);
+      if (u.length === 0) {
         if (n.generateTypescript) {
-          const h = Le(d, []);
+          const f = Be(d, []);
           if (n.check) {
-            if (await Ut(p) !== h) {
-              y(1), f(a, {
+            if (await qt(p) !== f) {
+              y(1), m(a, {
                 status: "assets_module_outdated",
                 appId: d,
                 modulePath: p,
@@ -2597,7 +2687,7 @@ function di(e, t) {
               }, `Registry assets module is out of date: ${p}. Run registry assets sync ${r} --generate-typescript.`);
               return;
             }
-            f(a, {
+            m(a, {
               status: "assets_current",
               appId: d,
               modulePath: p,
@@ -2606,7 +2696,7 @@ function di(e, t) {
             }, `Registry assets for ${d} and generated module are current.`);
             return;
           }
-          await xt(p, h), f(a, {
+          await Dt(p, f), m(a, {
             status: "assets_module_generated",
             appId: d,
             modulePath: p,
@@ -2615,7 +2705,7 @@ function di(e, t) {
           }, `Generated Registry assets module at ${p}.`);
           return;
         }
-        f(a, {
+        m(a, {
           status: "assets_current",
           appId: d,
           assetCount: 0,
@@ -2623,95 +2713,95 @@ function di(e, t) {
         }, `No Registry assets declared for ${d}.`);
         return;
       }
-      const { client: m } = await ie(e, t);
-      if (!await ui(m, a, d, r)) return;
-      const A = await m.assets.list(d), R = new Map(A.assets.map((h) => [h.id, h.registryUrl]));
+      const { client: h } = await ce(e, t);
+      if (!await hi(h, a, d, r)) return;
+      const b = await h.assets.list(d), $ = new Map(b.assets.map((f) => [f.id, f.registryUrl]));
       if (n.check) {
-        const h = await mi(o.root, d, l, R);
-        if (h.errors.length > 0) {
-          y(2), f(a, {
+        const f = await wi(o.root, d, u, $);
+        if (f.errors.length > 0) {
+          y(2), m(a, {
             status: "assets_sync_failed",
             appId: d,
-            errors: h.errors,
-            assets: h.assets
-          }, h.errors.join(`
+            errors: f.errors,
+            assets: f.assets
+          }, f.errors.join(`
 `));
           return;
         }
-        if (h.assets.some((P) => P.action !== "current" && P.action !== "validated")) {
-          y(1), f(a, {
+        if (f.assets.some((j) => j.action !== "current" && j.action !== "validated")) {
+          y(1), m(a, {
             status: "assets_outdated",
             appId: d,
-            assets: h.assets
+            assets: f.assets
           }, `Registry assets for ${d} are not fully synced. Run registry assets sync ${r}.`);
           return;
         }
         if (n.generateTypescript) {
-          const P = Le(d, l);
-          if (await Ut(p) !== P) {
-            y(1), f(a, {
+          const j = Be(d, u);
+          if (await qt(p) !== j) {
+            y(1), m(a, {
               status: "assets_module_outdated",
               appId: d,
               modulePath: p,
-              assetCount: l.length,
-              assets: h.assets
+              assetCount: u.length,
+              assets: f.assets
             }, `Registry assets module is out of date: ${p}. Run registry assets sync ${r} --generate-typescript.`);
             return;
           }
-          f(a, {
+          m(a, {
             status: "assets_current",
             appId: d,
             modulePath: p,
-            assetCount: l.length,
-            assets: h.assets
+            assetCount: u.length,
+            assets: f.assets
           }, `Registry assets for ${d} and generated module are current.`);
           return;
         }
-        f(a, {
+        m(a, {
           status: "assets_current",
           appId: d,
-          assets: h.assets
+          assets: f.assets
         }, `Registry assets for ${d} are current.`);
         return;
       }
-      const V = await gi(o.root, l), B = await m.assets.createUpload(d, {
-        assets: l.map(({ documentPath: h, ...P }) => P),
-        files: V.map((h) => ({
-          path: h.uploadPath,
-          size: h.size,
-          contentType: h.contentType
+      const A = await We(o.root, u.map(({ documentPath: f, ...j }) => j)), U = await h.assets.createUpload(d, {
+        assets: A.assets,
+        files: A.files.map((f) => ({
+          path: f.uploadPath,
+          size: f.size,
+          contentType: f.contentType
         }))
       });
-      for (const h of V) {
-        const P = B.files.find((Ks) => Ks.path === h.uploadPath);
-        if (!P) throw new Error(`No upload URL returned for ${h.uploadPath}`);
-        const ct = await fetch(P.url, {
-          method: P.method,
-          headers: P.headers,
-          body: await I(h.path)
+      for (const f of A.files) {
+        const j = U.files.find((er) => er.path === f.uploadPath);
+        if (!j) throw new Error(`No upload URL returned for ${f.uploadPath}`);
+        const ut = await fetch(j.url, {
+          method: j.method,
+          headers: j.headers,
+          body: f.kind === "local" ? await I(f.path) : f.bytes
         });
-        if (!ct.ok) throw new Error(`Upload failed for ${h.uploadPath}: ${ct.status}`);
+        if (!ut.ok) throw new Error(`Upload failed for ${f.uploadPath}: ${ut.status}`);
       }
-      const D = await m.assets.completeUpload(d, B.uploadId, { assets: l.map(({ documentPath: h, ...P }) => P) }), ot = await yi(u, D.assets);
+      const O = await h.assets.completeUpload(d, U.uploadId, { assets: A.assets }), he = await Ri(l, O.assets);
       if (n.generateTypescript) {
-        await xt(p, Le(d, Ct(u))), f(a, {
+        await Dt(p, Be(d, Nt(l))), m(a, {
           status: "assets_module_generated",
           appId: d,
-          uploadId: B.uploadId,
-          updatedPaths: ot,
+          uploadId: U.uploadId,
+          updatedPaths: he,
           modulePath: p,
-          assetCount: D.assets.length,
-          assets: D.assets
-        }, `Synced ${D.assets.length} Registry assets for ${d} and generated ${p}.`);
+          assetCount: O.assets.length,
+          assets: O.assets
+        }, `Synced ${O.assets.length} Registry assets for ${d} and generated ${p}.`);
         return;
       }
-      f(a, {
+      m(a, {
         status: "assets_synced",
         appId: d,
-        uploadId: B.uploadId,
-        updatedPaths: ot,
-        assets: D.assets
-      }, `Synced ${D.assets.length} Registry assets for ${d}.`);
+        uploadId: U.uploadId,
+        updatedPaths: he,
+        assets: O.assets
+      }, `Synced ${O.assets.length} Registry assets for ${d}.`);
     } catch (o) {
       if (y(2), a.json) {
         a.result({
@@ -2723,21 +2813,21 @@ function di(e, t) {
       throw o;
     }
   }), s.command("add").argument("<path-or-url>", "Package-root-relative asset path or HTTPS URL").requiredOption("--id <asset-id>", "User-facing Registry asset ID").option("-m, --manifest <path>", "Source manifest path").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    const a = _({
-      json: k(e, n),
+    const a = E({
+      json: _(e, n),
       write: t.write
     });
     try {
-      const o = je.parse(n.id);
-      me(r, "path-or-url");
-      const c = q({ manifest: n.manifest }), { document: d } = await Y(c.sourceManifest), u = vi(d), l = u.findIndex((m) => m.id === o), p = {
+      const o = $e.parse(n.id);
+      ie(r, "path-or-url");
+      const c = D({ manifest: n.manifest }), { document: d } = await Y(c.sourceManifest), l = Ai(d), u = l.findIndex((h) => h.id === o), p = {
         id: o,
         source: r
       };
-      l >= 0 ? u[l] = {
-        ...u[l],
+      u >= 0 ? l[u] = {
+        ...l[u],
         ...p
-      } : u.push(p), d.registryAssets = u, await J(c.sourceManifest, d), f(a, {
+      } : l.push(p), d.registryAssets = l, await z(c.sourceManifest, d), m(a, {
         status: "asset_added",
         manifestPath: c.sourceManifest,
         asset: p
@@ -2753,21 +2843,21 @@ function di(e, t) {
       throw o;
     }
   }), s.command("recover").argument("[root]", "Package root", ".").requiredOption("--app-id <app-id>", "Registered app ID to recover assets for").option("-m, --manifest <path>", "Source manifest path").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    const a = _({
-      json: k(e, n),
+    const a = E({
+      json: _(e, n),
       write: t.write
     });
     try {
-      const o = g.parse(n.appId), c = q({
+      const o = g.parse(n.appId), c = D({
         root: r,
         manifest: n.manifest
-      }), { client: d } = await ie(e, t), u = await d.assets.list(o), l = new Map(u.assets.map((m) => [m.id, m.registryUrl])), p = await bi(c.root, c.sourceManifest, l);
-      f(a, {
+      }), { client: d } = await ce(e, t), l = await d.assets.list(o), u = new Map(l.assets.map((h) => [h.id, h.registryUrl])), p = await Si(c.root, c.sourceManifest, u);
+      m(a, {
         status: "assets_recovered",
         manifestPath: c.sourceManifest,
         updatedPaths: p,
-        assets: u.assets
-      }, `Recovered ${u.assets.length} Registry assets into ${p.join(", ")}.`);
+        assets: l.assets
+      }, `Recovered ${l.assets.length} Registry assets into ${p.join(", ")}.`);
     } catch (o) {
       if (y(1), a.json) {
         a.result({
@@ -2780,13 +2870,13 @@ function di(e, t) {
     }
   });
 }
-async function ui(e, t, s, r) {
+async function hi(e, t, s, r) {
   const n = await e.apps.get(s);
-  return n.exists ? n.claim.claimedByCurrentUser ? !0 : (y(2), f(t, {
+  return n.exists ? n.claim.claimedByCurrentUser ? !0 : (y(2), m(t, {
     status: "app_membership_required",
     appId: s,
     message: `The current account is not a member of Registry app ${s}.`
-  }, `The current account is not a member of Registry app ${s}.`), !1) : (y(2), f(t, {
+  }, `The current account is not a member of Registry app ${s}.`), !1) : (y(2), m(t, {
     status: "app_not_claimed",
     appId: s,
     nextCommand: `registry claim ${r}`,
@@ -2795,20 +2885,20 @@ async function ui(e, t, s, r) {
 
 Run registry claim ${r} first.`), !1);
 }
-async function li(e, t) {
+async function gi(e, t) {
   const { manifest: s, document: r } = await Y(t);
   return s.registryAssets.kind === "files" ? Promise.all(s.registryAssets.paths.map(async (n) => {
     const a = T(e, n);
     return {
       path: a,
       field: "assets",
-      ...await Cs(a)
+      ...await Ms(a)
     };
   })) : s.registryAssets.kind === "inline" ? [{
     path: t,
     document: r,
     field: "registryAssets",
-    assets: Us(r)
+    assets: Ns(r)
   }] : [{
     path: t,
     document: r,
@@ -2816,13 +2906,13 @@ async function li(e, t) {
     assets: []
   }];
 }
-function Ct(e) {
+function Nt(e) {
   return e.flatMap((t) => t.assets.map((s) => ({
     ...s,
     documentPath: t.path
   })));
 }
-function pi(e) {
+function yi(e) {
   const t = /* @__PURE__ */ new Map();
   for (const s of e) {
     const r = t.get(s.id);
@@ -2830,12 +2920,12 @@ function pi(e) {
     t.set(s.id, s.documentPath);
   }
 }
-async function mi(e, t, s, r) {
+async function wi(e, t, s, r) {
   const n = [], a = [];
   for (const o of s) {
     const c = r.get(o.id);
     if (o.source) {
-      await fi(e, o, n);
+      await bi(e, o, n);
       const d = c && o.registryUrl === c ? "current" : c ? "repaired" : "materialized";
       a.push({
         id: o.id,
@@ -2870,15 +2960,15 @@ async function mi(e, t, s, r) {
     assets: a
   };
 }
-async function fi(e, t, s) {
+async function bi(e, t, s) {
   if (!t.source) return;
-  const r = me(t.source, `registryAssets.${t.id}.source`);
+  const r = ie(t.source, `registryAssets.${t.id}.source`);
   if (r.kind === "httpsUrl") {
-    await hi(r.url, t.id, s);
+    await vi(r.url, t.id, s);
     return;
   }
   try {
-    await re(T(e, r.path));
+    await Ee(T(e, r.path));
   } catch (n) {
     if (n instanceof Error && "code" in n && n.code === "ENOENT") {
       s.push(`Registry asset source not found for ${t.id}: ${r.path}`);
@@ -2887,7 +2977,7 @@ async function fi(e, t, s) {
     throw n;
   }
 }
-async function hi(e, t, s) {
+async function vi(e, t, s) {
   try {
     const r = await fetch(e, { method: "HEAD" });
     if (r.ok) return;
@@ -2904,24 +2994,7 @@ async function hi(e, t, s) {
     s.push(`Registry asset HTTPS source is not reachable for ${t}: ${e} (${n})`);
   }
 }
-async function gi(e, t) {
-  const s = /* @__PURE__ */ new Set(), r = [];
-  for (const n of t) {
-    if (!n.source) continue;
-    const a = me(n.source, `registryAssets.${n.id}.source`);
-    if (a.kind !== "artifactPath" || s.has(a.path)) continue;
-    s.add(a.path);
-    const o = T(e, a.path), c = await re(o);
-    r.push({
-      path: o,
-      uploadPath: as(a.path),
-      size: c.size,
-      contentType: Ie(a.path)
-    });
-  }
-  return r;
-}
-async function yi(e, t) {
+async function Ri(e, t) {
   const s = new Map(t.map((n) => [n.id, n.registryUrl])), r = [];
   for (const n of e) {
     let a = !1;
@@ -2929,38 +3002,38 @@ async function yi(e, t) {
       const c = s.get(o.id);
       c && o.registryUrl !== c && (o.registryUrl = c, a = !0);
     }
-    a && (n.document[n.field] = n.assets, await J(n.path, n.document), r.push(n.path));
+    a && (n.document[n.field] = n.assets, await z(n.path, n.document), r.push(n.path));
   }
   return r;
 }
-async function bi(e, t, s) {
+async function Si(e, t, s) {
   const { manifest: r, document: n } = await Y(t);
   if (r.registryAssets.kind === "files") {
     const a = [], o = new Map(s);
     for (const d of r.registryAssets.paths) {
-      const u = T(e, d), l = await Cs(u);
-      xs(l.assets, s, o), a.push({
-        path: u,
-        ...l
+      const l = T(e, d), u = await Ms(l);
+      qs(u.assets, s, o), a.push({
+        path: l,
+        ...u
       });
     }
     const c = a[0];
     if (c) {
-      Ms(c.assets, o);
-      for (const d of a) await J(d.path, d.document);
+      Ds(c.assets, o);
+      for (const d of a) await z(d.path, d.document);
       return a.map((d) => d.path);
     }
   }
   if (r.registryAssets.kind === "inline") {
-    const a = Us(n);
-    return wi(a, s), n.registryAssets = a, await J(t, n), [t];
+    const a = Ns(n);
+    return Ii(a, s), n.registryAssets = a, await z(t, n), [t];
   }
   return n.registryAssets = [...s].map(([a, o]) => ({
     id: a,
     registryUrl: o
-  })), await J(t, n), [t];
+  })), await z(t, n), [t];
 }
-async function Cs(e) {
+async function Ms(e) {
   const t = await I(e, "utf8");
   let s;
   try {
@@ -2971,47 +3044,47 @@ async function Cs(e) {
   if (!s || typeof s != "object" || Array.isArray(s)) throw new Error("Registry assets manifest must be a JSON object");
   const r = s.assets;
   if (!Array.isArray(r)) throw new Error("Registry assets manifest must include an assets array");
-  return ds(s), {
+  return ps(s), {
     document: s,
     assets: r
   };
 }
-function Us(e) {
+function Ns(e) {
   const t = e.registryAssets;
   if (!Array.isArray(t)) throw new Error("assets helpers require inline registryAssets in the source manifest");
-  return st(t), t;
+  return it(t), t;
 }
-function wi(e, t) {
+function Ii(e, t) {
   const s = new Map(t);
-  xs(e, t, s), Ms(e, s);
+  qs(e, t, s), Ds(e, s);
 }
-function xs(e, t, s) {
+function qs(e, t, s) {
   for (const r of e) {
     const n = t.get(r.id);
     n && (r.registryUrl = n, s.delete(r.id));
   }
 }
-function Ms(e, t) {
+function Ds(e, t) {
   for (const [s, r] of t) e.push({
     id: s,
     registryUrl: r
   });
 }
-function vi(e) {
+function Ai(e) {
   const t = e.registryAssets;
   if (t === void 0) return [];
   if (!Array.isArray(t)) throw new Error("assets helpers require inline registryAssets in the source manifest");
   try {
-    return st(t);
+    return it(t);
   } catch {
     throw new Error("assets helpers require inline registryAssets in the source manifest");
   }
 }
-function Ri(e, t) {
+function Pi(e, t) {
   const s = t ?? "src/registry-assets.gen.ts";
-  return Je(s) || pe(s, t ? "out" : "registryAssetsModule"), Je(s) ? T(s) : T(e, s);
+  return He(s) || ee(s, t ? "out" : "registryAssetsModule"), He(s) ? T(s) : T(e, s);
 }
-async function Ut(e) {
+async function qt(e) {
   try {
     return await I(e, "utf8");
   } catch (t) {
@@ -3019,28 +3092,28 @@ async function Ut(e) {
     throw t;
   }
 }
-async function xt(e, t) {
-  await Bt(sr(e), { recursive: !0 }), await Ge(e, t);
+async function Dt(e, t) {
+  await Gt(ar(e), { recursive: !0 }), await Ke(e, t);
 }
-function Le(e, t) {
+function Be(e, t) {
   const s = [...t].sort((c, d) => c.id.localeCompare(d.id)), r = s.filter((c) => !c.registryUrl).map((c) => c.id);
   if (r.length > 0) throw new Error(`Registry assets must be synced before generating TypeScript helpers: ${r.join(", ")}`);
   const n = /* @__PURE__ */ new Map();
   let a = `/apps/${e}`;
   for (const c of s) {
-    const d = Si(e, c);
+    const d = Ei(e, c);
     if (a.startsWith("/"))
       a = d.appCdnUrl;
     else if (d.appCdnUrl !== a) throw new Error(`Registry asset ${c.id} registryUrl must share app CDN URL ${a}`);
     n.set(c.id, d.extension);
   }
   const o = ["// Generated by registry assets sync --generate-typescript. Do not edit manually.", ""];
-  o.push(`export const APP_CDN_URL = ${Ve(a)} as const`), o.push(""), o.push("export const ASSET_EXTENSIONS = {");
-  for (const c of s) o.push(`  ${Ve(c.id)}: ${Ve(n.get(c.id) ?? "")},`);
+  o.push(`export const APP_CDN_URL = ${Fe(a)} as const`), o.push(""), o.push("export const ASSET_EXTENSIONS = {");
+  for (const c of s) o.push(`  ${Fe(c.id)}: ${Fe(n.get(c.id) ?? "")},`);
   return o.push("} as const"), o.push(""), o.push("export type RegistryAssetId = keyof typeof ASSET_EXTENSIONS"), o.push(""), o.push("export function registryAssetUrl(id: RegistryAssetId) {"), o.push("  return `${APP_CDN_URL}/assets/${id}.${ASSET_EXTENSIONS[id]}`"), o.push("}"), o.push(""), o.join(`
 `);
 }
-function Si(e, t) {
+function Ei(e, t) {
   if (!t.registryUrl) throw new Error(`Registry asset ${t.id} must be synced before generating TypeScript helpers.`);
   const s = new URL(t.registryUrl), r = `/apps/${e}/assets/${t.id}.`;
   if (!s.pathname.startsWith(r) || s.search || s.hash) throw new Error(`Registry asset ${t.id} registryUrl must be canonical: /apps/${e}/assets/${t.id}.<extension>`);
@@ -3051,34 +3124,34 @@ function Si(e, t) {
     extension: n
   };
 }
-function Ve(e) {
+function Fe(e) {
   return `'${e.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 }
-async function Ii(e) {
-  if (e.query && e.queryFile) throw new Ae("Use either --query or --query-file, not both");
+async function _i(e) {
+  if (e.query && e.queryFile) throw new Pe("Use either --query or --query-file, not both");
   const t = e.queryFile ? await I(e.queryFile, "utf8") : e.query;
   if (t)
     try {
       return JSON.parse(t);
     } catch (s) {
-      throw new Ae(`Invalid Registry RQL JSON${s instanceof Error ? `: ${s.message}` : ""}`);
+      throw new Pe(`Invalid Registry RQL JSON${s instanceof Error ? `: ${s.message}` : ""}`);
     }
 }
-var Ae = class extends Error {
+var Pe = class extends Error {
 };
-function Os(e, t = {}) {
+function Ls(e, t = {}) {
   const s = t.descriptionPrefix ? `${t.descriptionPrefix} ` : "";
   return e.option("--query <json>", `Filter ${s}with a Registry RQL JSON expr`).option("--query-file <path>", "Read a Registry RQL JSON expr from a file").option("--include-reserved", `Include registry-reserved versions${s ? ` in ${s.trim()}` : ""}`);
 }
-async function qs(e) {
+async function Vs(e) {
   return {
-    query: await Ii(e),
+    query: await _i(e),
     includeReserved: e.includeReserved
   };
 }
-function Ai(e, t) {
+function ki(e, t) {
   const s = e.command("channels").alias("c").description("Manage Registry distribution channels");
-  Wa(s, e, t), s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
+  Ya(s, e, t), s.command("list").option("--json", "Print a machine-readable result").action(async (r) => {
     await H(e, t, r, async ({ client: n }) => {
       const a = await n.channels.list();
       return {
@@ -3086,10 +3159,10 @@ function Ai(e, t) {
           status: "channels_listed",
           channels: a.channels
         },
-        message: Ti(a.channels)
+        message: Ui(a.channels)
       };
     });
-  }), Os(s.command("show").argument("<channel-id>", "Distribution channel ID").option("--app-id <app-id>", "Filter assignments by app ID"), { descriptionPrefix: "public runtime listings" }).option("--json", "Print a machine-readable result").action(async (r, n) => {
+  }), Ls(s.command("show").argument("<channel-id>", "Distribution channel ID").option("--app-id <app-id>", "Filter assignments by app ID"), { descriptionPrefix: "public runtime listings" }).option("--json", "Print a machine-readable result").action(async (r, n) => {
     await H(e, t, n, async ({ client: a }) => {
       if (n.appId) {
         const c = await a.channels.assignments(r, { appId: n.appId });
@@ -3099,17 +3172,17 @@ function Ai(e, t) {
             channel: c.channel,
             assignments: c.assignments
           },
-          message: Mt(c.assignments)
+          message: Lt(c.assignments)
         };
       }
-      const o = await a.channels.get(r, await qs(n));
+      const o = await a.channels.get(r, await Vs(n));
       return {
         payload: {
           status: "channel_shown",
           channel: o.channel,
           apps: o.apps
         },
-        message: $i(o.apps)
+        message: Oi(o.apps)
       };
     });
   }), s.command("current").requiredOption("--app-id <app-id>", "Filter assignments by app ID").option("--json", "Print a machine-readable result").action(async (r) => {
@@ -3125,7 +3198,7 @@ function Ai(e, t) {
           appId: r.appId,
           assignments: o
         },
-        message: Mt(o)
+        message: Lt(o)
       };
     });
   }), s.command("connect").argument("<channel-id>", "Distribution channel ID").requiredOption("-v, --version-id <app-version-uuid>", "App version UUID").option("--reason <text>", "Connection reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
@@ -3157,9 +3230,9 @@ function Ai(e, t) {
     });
   }), s.command("rollback").argument("<channel-id>", "Distribution channel ID").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root").option("--to-version <app-version-uuid>", "Target app version UUID").option("--reason <text>", "Rollback reason").option("--dry-run", "Preview rollback without mutating Registry state").option("--json", "Print a machine-readable result").action(async (r, n) => {
     await H(e, t, n, async ({ client: a }) => {
-      const o = await Ei(n);
-      if (r === "prod" && !n.toVersion) throw new oe("Production rollback requires --to-version");
-      if (r === "prod" && !n.reason) throw new oe("Production rollback requires --reason");
+      const o = await Ti(n);
+      if (r === "prod" && !n.toVersion) throw new de("Production rollback requires --to-version");
+      if (r === "prod" && !n.reason) throw new de("Production rollback requires --reason");
       const c = await a.channels.rollback(r, {
         appId: o,
         toVersionId: n.toVersion,
@@ -3175,39 +3248,39 @@ function Ai(e, t) {
           eligibility: c.eligibility,
           ...c.reason ? { reason: c.reason } : {}
         },
-        message: _i(c)
+        message: $i(c)
       };
     });
   });
 }
 async function H(e, t, s, r) {
-  await O(e, t, s, r, {
+  await q(e, t, s, r, {
     defaultErrorMessage: "Registry channels command failed",
     formatError: (n) => ({
       status: "error",
-      message: Pi(n, ji(s))
+      message: ji(n, xi(s))
     }),
-    isUsageError: (n) => n instanceof oe || n instanceof Ae
+    isUsageError: (n) => n instanceof de || n instanceof Pe
   });
 }
-function Pi(e, t) {
-  if (e instanceof oe) return e.message;
-  if (e instanceof E && e.code === "prod_requires_approved") {
-    const s = ki(e.rawPayload) || t, r = s ? ` Run: registry versions approve ${s}` : " Run registry versions approve <version-id> first.";
+function ji(e, t) {
+  if (e instanceof de) return e.message;
+  if (e instanceof P && e.code === "prod_requires_approved") {
+    const s = Ci(e.rawPayload) || t, r = s ? ` Run: registry versions approve ${s}` : " Run registry versions approve <version-id> first.";
     return `${e.message}.${r}`;
   }
   return e instanceof Error ? e.message : "Registry channels command failed";
 }
-async function Ei(e) {
-  if (!e.appId && !e.root) throw new oe("Provide an app context with --app-id or --root");
-  const t = await at({
+async function Ti(e) {
+  if (!e.appId && !e.root) throw new de("Provide an app context with --app-id or --root");
+  const t = await dt({
     appId: e.appId,
     root: e.root
   });
   if (t.appId && !K(t.diagnostics)) return t.appId;
   throw new Error(fe(t.diagnostics) || "Unable to resolve Registry app ID");
 }
-function _i(e) {
+function $i(e) {
   return [
     `${e.status === "dry_run" ? "Dry run" : "Rolled back"} ${e.channel.id}.`,
     `Current assignment: ${e.currentAssignment.appVersionId}`,
@@ -3215,56 +3288,56 @@ function _i(e) {
   ].join(`
 `);
 }
-var oe = class extends Error {
+var de = class extends Error {
 };
-function ki(e) {
+function Ci(e) {
   if (!e || typeof e != "object") return null;
   const t = e;
   return typeof t.versionId == "string" ? t.versionId : null;
 }
-function ji(e) {
+function xi(e) {
   return "versionId" in e && typeof e.versionId == "string" ? e.versionId : void 0;
 }
-function Mt(e) {
-  return C({
+function Lt(e) {
+  return x({
     columns: [
       {
         header: "CHANNEL",
         value: (t) => t.channelId,
-        color: b.id
+        color: w.id
       },
       {
         header: "APP ID",
         value: (t) => t.appId,
-        color: b.id
+        color: w.id
       },
       {
         header: "VERSION ID",
         value: (t) => t.appVersionId,
-        color: b.id
+        color: w.id
       }
     ],
     rows: e,
     emptyMessage: "No channel assignments found."
   });
 }
-function Ti(e) {
-  return C({
+function Ui(e) {
+  return x({
     columns: [{
       header: "CHANNEL",
       value: (t) => t.id,
-      color: b.id
+      color: w.id
     }],
     rows: e,
     emptyMessage: "No channels found."
   });
 }
-function $i(e) {
-  return C({
+function Oi(e) {
+  return x({
     columns: [{
       header: "APP ID",
       value: (t) => t.id,
-      color: b.id
+      color: w.id
     }, {
       header: "TITLE",
       value: (t) => t.title
@@ -3273,56 +3346,43 @@ function $i(e) {
     emptyMessage: "No apps found."
   });
 }
-async function Ci(e) {
+async function Mi(e) {
   const t = [];
   async function s(r) {
-    for (const n of await er(r, { withFileTypes: !0 })) {
-      const a = x(r, n.name);
+    for (const n of await rr(r, { withFileTypes: !0 })) {
+      const a = B(r, n.name);
       if (n.isDirectory()) await s(a);
       else if (n.isFile()) {
-        const o = await re(a);
+        const o = await Ee(a);
         t.push({
-          path: rr(e, a).replace(/\\/g, "/"),
+          path: ir(e, a).replace(/\\/g, "/"),
           size: o.size,
-          contentType: Ie(a)
+          contentType: X(a)
         });
       }
     }
   }
   return await s(e), t;
 }
-async function Ui(e = {}) {
-  const t = q(e), s = [], r = await xi(t.sourceManifest, s), n = await nt(t.root);
-  if (Mi(r.document, r.manifest, n, t.sourceManifest, s), !ze(t.artifactDirectory))
+async function Ni(e = {}) {
+  const t = D(e), s = [], r = await qi(t.sourceManifest, s), n = await ct(t.root);
+  if (Di(r.document, r.manifest, n, t.sourceManifest, s), !Ge(t.artifactDirectory))
     return s.push({
       code: "artifact_dist_missing",
       severity: e.requireDist ? "error" : "warning",
       message: "Built app artifact directory was not found.",
       source: "artifact",
       target: t.artifactDirectory
-    }), Ni(t, r, n, s);
-  const a = await Oi(t.artifactManifest, s);
-  r.manifest?.appId && a?.appId && r.manifest.appId !== a.appId && s.push({
-    code: "artifact_app_id_mismatch",
-    severity: "error",
-    message: "Source and artifact manifest appId values must match.",
-    source: "artifact",
-    target: t.artifactManifest
-  }), a && !a.appId && s.push({
-    code: "manifest_missing_app_id",
-    severity: "error",
-    message: "Artifact manifest is missing appId.",
-    source: "artifact",
-    target: t.artifactManifest
-  }), ze(t.artifactEntrypoint) || s.push({
+    }), Bi(t, r, n, s);
+  Ge(t.artifactEntrypoint) ? await Li(t.artifactEntrypoint, s) : s.push({
     code: "artifact_entrypoint_missing",
     severity: "error",
     message: "Artifact entrypoint index.html is required.",
     source: "artifact",
     target: t.artifactEntrypoint
   });
-  const o = await qi(t.artifactDirectory, s), c = o.reduce((d, u) => d + u.size, 0);
-  return o.length === 0 && s.push({
+  const a = await Vi(t.artifactDirectory, s), o = a.reduce((c, d) => c + d.size, 0);
+  return a.length === 0 && s.push({
     code: "artifact_empty",
     severity: "error",
     message: "Built app artifact directory is empty.",
@@ -3332,19 +3392,18 @@ async function Ui(e = {}) {
     paths: t,
     sourceDocument: r.document,
     sourceManifest: r.manifest,
-    artifactManifest: a,
-    files: o,
-    totalBytes: c,
+    files: a,
+    totalBytes: o,
     detectedPrimerSdkVersion: n,
     diagnostics: s
   };
 }
-async function xi(e, t) {
+async function qi(e, t) {
   let s;
   try {
     s = await I(e, "utf8");
   } catch (a) {
-    if (Ns(a))
+    if (Fi(a))
       return t.push({
         code: "manifest_missing",
         severity: "error",
@@ -3377,7 +3436,7 @@ async function xi(e, t) {
   try {
     return {
       document: n,
-      manifest: $e(r)
+      manifest: xe(r)
     };
   } catch (a) {
     return t.push({
@@ -3392,7 +3451,7 @@ async function xi(e, t) {
     };
   }
 }
-function Mi(e, t, s, r, n) {
+function Di(e, t, s, r, n) {
   e && typeof e.title != "string" && n.push({
     code: "manifest_missing_title",
     severity: "error",
@@ -3421,23 +3480,25 @@ function Mi(e, t, s, r, n) {
     target: r
   });
 }
-async function Oi(e, t) {
+async function Li(e, t) {
+  let s;
   try {
-    return await $a(e);
-  } catch (s) {
-    return t.push({
-      code: Ns(s) ? "artifact_manifest_missing" : "artifact_manifest_invalid",
-      severity: "error",
-      message: s instanceof Error ? s.message : "Artifact manifest is invalid.",
-      source: "artifact",
-      target: e
-    }), null;
+    s = await I(e, "utf8");
+  } catch {
+    return;
   }
+  /(?:\b(?:src|href)\s*=\s*["']|url\(\s*["']?)\/(?!\/)/i.test(s) && t.push({
+    code: "artifact_absolute_urls",
+    severity: "warning",
+    message: 'Entrypoint references root-absolute URLs (for example /assets/…). App versions are served from a path prefix, so use relative URLs (a Vite build sets this with base: "./").',
+    source: "artifact",
+    target: e
+  });
 }
-async function qi(e, t) {
+async function Vi(e, t) {
   try {
-    const s = await Ci(e);
-    return await Promise.all(s.map((r) => Vt(x(e, r.path)))), s;
+    const s = await Mi(e);
+    return await Promise.all(s.map((r) => Ht(B(e, r.path)))), s;
   } catch (s) {
     return t.push({
       code: "artifact_file_unreadable",
@@ -3448,28 +3509,27 @@ async function qi(e, t) {
     }), [];
   }
 }
-function Ni(e, t, s, r) {
+function Bi(e, t, s, r) {
   return {
     paths: e,
     sourceDocument: t.document,
     sourceManifest: t.manifest,
-    artifactManifest: null,
     files: [],
     totalBytes: 0,
     detectedPrimerSdkVersion: s,
     diagnostics: r
   };
 }
-function Ns(e) {
+function Fi(e) {
   return e instanceof Error && "code" in e && e.code === "ENOENT";
 }
-async function Ds(e) {
-  const t = (e.mode ?? "publish-required") === "publish-required", s = Ce(e.registryOptions ?? {}), r = await Ui({
+async function Bs(e) {
+  const t = (e.mode ?? "publish-required") === "publish-required", s = Ue(e.registryOptions ?? {}), r = await Ni({
     root: e.root,
     manifest: e.manifest,
     dist: e.dist,
     requireDist: t || e.requireDist === !0
-  }), n = [...r.diagnostics], a = r.sourceManifest?.appId ?? null, o = r.artifactManifest?.appId ?? null, c = a;
+  }), n = [...r.diagnostics], a = r.sourceManifest?.appId ?? null, o = a;
   if (K(n) || (!a && t && n.push({
     code: "manifest_missing_app_id",
     severity: "error",
@@ -3477,58 +3537,46 @@ async function Ds(e) {
     source: "manifest",
     target: r.paths.sourceManifest,
     nextCommand: "registry claim"
-  }), !o && t && n.push({
-    code: "manifest_missing_app_id",
-    severity: "error",
-    message: "Artifact manifest must include appId before publishing.",
-    source: "artifact",
-    target: r.paths.artifactManifest
-  }), a && o && a !== o && n.push({
-    code: "artifact_app_id_mismatch",
-    severity: "error",
-    message: "Source and artifact manifest appId values must match.",
-    source: "artifact",
-    target: r.paths.artifactManifest
   }), r.files.length === 0 && t && n.push({
     code: "artifact_empty",
     severity: "error",
     message: "Built app artifact directory is empty.",
     source: "artifact",
     target: r.paths.artifactDirectory
-  }), K(n)) || !a) return W(r, n, c, s);
-  const d = a;
-  if (e.local) return He(r, n, d, s, null, null, { kind: "unknown" });
-  const u = await Di(s, e.registryOptions, e.services, n, t ? "error" : "warning");
-  if (!u) return Ot(r, n, a, s, t);
-  const l = z(u.registryUrl, {
-    token: u.accessToken,
+  }), K(n)) || !a) return W(r, n, o, s);
+  const c = a;
+  if (e.local) return Qe(r, n, c, s, null, null, { kind: "unknown" });
+  const d = await zi(s, e.registryOptions, e.services, n, t ? "error" : "warning");
+  if (!d) return Vt(r, n, a, s, t);
+  const l = J(d.registryUrl, {
+    token: d.accessToken,
     request: e.services.request
   });
   try {
-    const p = await l.apps.get(d);
-    return p.exists ? p.claim.claimedByCurrentUser ? He(r, n, d, s, u, l, {
+    const u = await l.apps.get(c);
+    return u.exists ? u.claim.claimedByCurrentUser ? Qe(r, n, c, s, d, l, {
       kind: "known",
       appExists: !0,
-      role: p.claim.role
+      role: u.claim.role
     }) : (n.push({
       code: "app_membership_required",
       severity: "error",
-      message: `Current Registry account cannot publish app ID "${d}".`,
+      message: `Current Registry account cannot publish app ID "${c}".`,
       source: "registry"
-    }), W(r, n, d, s)) : (n.push({
+    }), W(r, n, c, s)) : (n.push({
       code: "app_not_claimed",
       severity: "error",
-      message: `App ID "${d}" has not been claimed for this Registry.`,
+      message: `App ID "${c}" has not been claimed for this Registry.`,
       source: "registry",
       nextCommand: "registry claim"
-    }), W(r, n, d, s));
-  } catch (p) {
-    return n.push(Ls(p, t ? "error" : "warning")), Ot(r, n, d, s, t);
+    }), W(r, n, c, s));
+  } catch (u) {
+    return n.push(Fs(u, t ? "error" : "warning")), Vt(r, n, c, s, t);
   }
 }
-async function Di(e, t, s, r, n) {
-  const a = Li(t);
-  if (a) return Vi(e, a, s.now());
+async function zi(e, t, s, r, n) {
+  const a = Ji(t);
+  if (a) return Hi(e, a, s.now());
   const o = await s.readSession();
   if (!o || o.registryUrl !== e)
     return r.push({
@@ -3540,7 +3588,7 @@ async function Di(e, t, s, r, n) {
     }), null;
   if (new Date(o.expiresAt).getTime() > s.now() + 3e4) return o;
   try {
-    const c = await z(e, { request: s.request }).auth.refresh({ refreshToken: o.refreshToken }), d = {
+    const c = await J(e, { request: s.request }).auth.refresh({ refreshToken: o.refreshToken }), d = {
       registryUrl: e,
       accessToken: c.accessToken,
       refreshToken: c.refreshToken,
@@ -3549,14 +3597,14 @@ async function Di(e, t, s, r, n) {
     };
     return await s.saveSession(d), d;
   } catch (c) {
-    return r.push(Ls(c, n)), null;
+    return r.push(Fs(c, n)), null;
   }
 }
-function Li(e) {
+function Ji(e) {
   const t = e?.token?.trim();
   return t || process.env.REGISTRY_ACCESS_TOKEN?.trim() || void 0;
 }
-function Vi(e, t, s) {
+function Hi(e, t, s) {
   return {
     registryUrl: e,
     accessToken: t,
@@ -3568,8 +3616,8 @@ function Vi(e, t, s) {
     }
   };
 }
-function Ls(e, t = "error") {
-  if (e instanceof E) {
+function Fs(e, t = "error") {
+  if (e instanceof P) {
     if (e.status === 401) return {
       code: "auth_session_expired",
       severity: t,
@@ -3611,7 +3659,7 @@ function W(e, t, s, r) {
     remoteState: { kind: "unknown" }
   };
 }
-function He(e, t, s, r, n, a, o) {
+function Qe(e, t, s, r, n, a, o) {
   return {
     ok: !0,
     diagnostics: t,
@@ -3624,15 +3672,15 @@ function He(e, t, s, r, n, a, o) {
     remoteState: o
   };
 }
-function Ot(e, t, s, r, n) {
-  return n ? W(e, t, s, r) : He(e, t, s, r, null, null, { kind: "unknown" });
+function Vt(e, t, s, r, n) {
+  return n ? W(e, t, s, r) : Qe(e, t, s, r, null, null, { kind: "unknown" });
 }
-function Bi(e, t) {
+function Gi(e, t) {
   e.command("check").argument("[root]", "Primer app project root", ".").description("Check whether a Primer app project is ready for Registry publishing").option("-m, --manifest <path>", "Source manifest path").option("-d, --dist <path>", "Built app artifact directory").option("--local", "Skip Registry session and remote app checks").option("--require-dist", "Treat a missing built app artifact directory as an error").option("--json", "Print a machine-readable result").action(async (s, r) => {
-    const n = _({
-      json: k(e, r),
+    const n = E({
+      json: _(e, r),
       write: t.write
-    }), a = await Ds({
+    }), a = await Bs({
       root: s,
       manifest: r.manifest,
       dist: r.dist,
@@ -3642,7 +3690,7 @@ function Bi(e, t) {
       requireDist: r.requireDist,
       mode: "check"
     }), o = !K(a.diagnostics);
-    o || y(2), f(n, {
+    o || y(2), m(n, {
       status: "checked",
       ok: o,
       registryUrl: a.registryUrl,
@@ -3655,24 +3703,24 @@ function Bi(e, t) {
         primerSdkVersion: a.inspection.sourceManifest?.primerSdkVersion ?? null,
         remoteState: a.remoteState
       }
-    }, Fi(a, o));
+    }, Wi(a, o));
   });
 }
-function Fi(e, t) {
+function Wi(e, t) {
   const s = [t ? "Registry check completed." : "Registry check failed."];
   s.push(`Registry: ${e.registryUrl}`), e.appId && s.push(`App ID: ${e.appId}`), e.inspection.files.length > 0 && s.push(`Files: ${e.inspection.files.length} (${e.inspection.totalBytes} bytes)`), e.diagnostics.length > 0 && s.push("", fe(e.diagnostics));
   const r = Array.from(new Set(e.diagnostics.map((n) => n.nextCommand).filter(Boolean)));
   return r.length > 0 && s.push("", `Next: ${r.join(" && ")}`), s.join(`
 `);
 }
-function Ji(e, t) {
+function Qi(e, t) {
   e.command("init").argument("[root]", "Primer app project root", ".").description("Initialize local Registry manifest metadata").option("-m, --manifest <path>", "Source manifest path").option("--json", "Print a machine-readable preview without writing").action(async (s, r) => {
-    const n = k(e, r), a = _({
+    const n = _(e, r), a = E({
       json: n,
       write: t.write
     });
     try {
-      const o = await _s({
+      const o = await Ts({
         root: s,
         manifest: r.manifest,
         json: n
@@ -3697,10 +3745,10 @@ function Ji(e, t) {
     }
   });
 }
-function zi(e, t) {
+function Yi(e, t) {
   const s = e.command("members").description("Manage Registry app members");
   s.command("list").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root", ".").option("--json", "Print a machine-readable result").action(async (r) => {
-    await ye(e, t, r, async ({ client: n }) => {
+    await we(e, t, r, async ({ client: n }) => {
       const a = await be(r), o = await n.members.list(a);
       return {
         payload: {
@@ -3708,12 +3756,12 @@ function zi(e, t) {
           appId: a,
           members: o.members
         },
-        message: Qi(a, o.members)
+        message: eo(a, o.members)
       };
     });
   }), s.command("add").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root", ".").option("--email <email>", "Registry account email").option("--user-id <user-id>", "Registry user ID").requiredOption("--role <role>", "App member role: owner or member").option("--json", "Print a machine-readable result").action(async (r) => {
-    await ye(e, t, r, async ({ client: n }) => {
-      Be(r);
+    await we(e, t, r, async ({ client: n }) => {
+      ze(r);
       const a = await be(r), o = await n.members.add(a, {
         ...r.email ? { email: r.email } : { userId: r.userId },
         role: r.role
@@ -3728,9 +3776,9 @@ function zi(e, t) {
       };
     });
   }), s.command("remove").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root", ".").option("--email <email>", "Registry account email").option("--user-id <user-id>", "Registry user ID").option("--json", "Print a machine-readable result").action(async (r) => {
-    await ye(e, t, r, async ({ client: n }) => {
-      Be(r);
-      const a = await be(r), o = r.userId ?? await qt(n, a, r.email);
+    await we(e, t, r, async ({ client: n }) => {
+      ze(r);
+      const a = await be(r), o = r.userId ?? await Bt(n, a, r.email);
       return o ? (await n.members.remove(a, o), {
         payload: {
           status: "member_removed",
@@ -3739,13 +3787,13 @@ function zi(e, t) {
           target: G(r)
         },
         message: `Removed ${G(r)} from ${a}.`
-      }) : Nt(a, G(r));
+      }) : Ft(a, G(r));
     });
   }), s.command("set-role").option("--app-id <app-id>", "Registry app ID").option("--root <root>", "Primer app project root", ".").option("--email <email>", "Registry account email").option("--user-id <user-id>", "Registry user ID").requiredOption("--role <role>", "App member role: owner or member").option("--json", "Print a machine-readable result").action(async (r) => {
-    await ye(e, t, r, async ({ client: n }) => {
-      Be(r);
-      const a = await be(r), o = r.userId ?? await qt(n, a, r.email);
-      if (!o) return Nt(a, G(r));
+    await we(e, t, r, async ({ client: n }) => {
+      ze(r);
+      const a = await be(r), o = r.userId ?? await Bt(n, a, r.email);
+      if (!o) return Ft(a, G(r));
       const c = await n.members.setRole(a, o, { role: r.role });
       return {
         payload: {
@@ -3758,33 +3806,33 @@ function zi(e, t) {
     });
   });
 }
-async function ye(e, t, s, r) {
-  await O(e, t, s, r, {
+async function we(e, t, s, r) {
+  await q(e, t, s, r, {
     defaultErrorMessage: "Registry members command failed",
-    formatError: Gi,
-    isUsageError: Hi
+    formatError: Xi,
+    isUsageError: Ki
   });
 }
 async function be(e) {
-  const t = await at({
+  const t = await dt({
     appId: e.appId,
     root: e.root
   });
   if (t.appId && !K(t.diagnostics)) return t.appId;
   throw new Error(fe(t.diagnostics) || "Unable to resolve Registry app ID");
 }
-function Be(e) {
-  if (!!e.email == !!e.userId) throw new Vs("Provide exactly one member selector: --email or --user-id");
+function ze(e) {
+  if (!!e.email == !!e.userId) throw new zs("Provide exactly one member selector: --email or --user-id");
 }
-var Vs = class extends Error {
+var zs = class extends Error {
 };
-function Hi(e) {
-  return e instanceof Vs;
+function Ki(e) {
+  return e instanceof zs;
 }
-async function qt(e, t, s) {
+async function Bt(e, t, s) {
   return (await e.members.list(t)).members.find((r) => r.email?.toLowerCase() === s.toLowerCase())?.userId ?? null;
 }
-function Nt(e, t) {
+function Ft(e, t) {
   return y(2), {
     payload: {
       status: "member_not_found",
@@ -3795,25 +3843,25 @@ function Nt(e, t) {
     message: `Member ${t} was not found on ${e}.`
   };
 }
-function Gi(e) {
-  return e instanceof E ? {
-    status: Wi(e),
+function Xi(e) {
+  return e instanceof P ? {
+    status: Zi(e),
     message: e.message
   } : {
     status: "error",
     message: e instanceof Error ? e.message : "Registry members command failed"
   };
 }
-function Wi(e) {
+function Zi(e) {
   return e.code === "permission_denied" || e.status === 403 ? "permission_denied" : e.code === "user_not_found" ? "user_not_found" : e.code === "member_not_found" ? "member_not_found" : e.code === "last_owner_required" ? "last_owner_required" : "error";
 }
-function Qi(e, t) {
-  return C({
+function eo(e, t) {
+  return x({
     columns: [
       {
         header: "USER ID",
         value: (s) => s.userId,
-        color: b.id
+        color: w.id
       },
       {
         header: "EMAIL",
@@ -3822,21 +3870,21 @@ function Qi(e, t) {
       {
         header: "ROLE",
         value: (s) => s.role,
-        color: Yi
+        color: to
       }
     ],
     rows: t,
     emptyMessage: `No members found for ${e}.`
   });
 }
-function Yi(e) {
-  return e.trim() === "owner" ? b.success(e) : e;
+function to(e) {
+  return e.trim() === "owner" ? w.success(e) : e;
 }
 function G(e) {
   return e.email ?? e.userId ?? "member";
 }
-function Ki(e) {
-  const t = e.inspection.artifactManifest ?? e.inspection.sourceManifest;
+function so(e) {
+  const t = e.inspection.sourceManifest;
   if (!t) throw new Error("Cannot create publish plan without a manifest.");
   const s = !!e.forceApprove;
   return {
@@ -3853,27 +3901,27 @@ function Ki(e) {
     remoteState: e.remoteState
   };
 }
-function Xi(e, t) {
-  Bs(e.command("publish"), e, t);
+function ro(e, t) {
+  Js(e.command("publish"), e, t);
 }
-function Zi(e, t, s) {
-  Bs(e.command("publish"), t, s);
+function no(e, t, s) {
+  Js(e.command("publish"), t, s);
 }
-function Bs(e, t, s) {
+function Js(e, t, s) {
   e.argument("[root]", "Primer app project root", ".").description("Publish a Primer app project root").option("-m, --manifest <path>", "Source manifest path").option("-d, --dist <path>", "Built app artifact directory").option("--force-approve", "Approve and connect the uploaded app version to production").option("--dry-run", "Validate and print the upload plan without creating an upload").option("--local", "Skip Registry preflight checks for dry-run validation").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    const a = _({
-      json: k(t, n),
+    const a = E({
+      json: _(t, n),
       write: s.write
     });
     try {
       if (n.local && !n.dryRun) {
-        y(2), f(a, {
+        y(2), m(a, {
           status: "error",
           message: "Local publish is only supported with --dry-run."
         }, "Local publish is only supported with --dry-run.");
         return;
       }
-      const o = await Ds({
+      const o = await Bs({
         root: r,
         manifest: n.manifest,
         dist: n.dist,
@@ -3883,65 +3931,68 @@ function Bs(e, t, s) {
         mode: "publish-required"
       });
       if (!o.ok) {
-        ro(a, o.diagnostics, o.inspection, o.appId);
+        uo(a, o.diagnostics, o.inspection, o.appId);
         return;
       }
       if (!o.appId) throw new Error("App ID is required before publishing.");
-      const c = Ki({
+      const c = so({
         inspection: o.inspection,
         appId: o.appId,
         forceApprove: n.forceApprove,
         remoteState: o.remoteState
       });
       if (n.dryRun) {
-        f(a, {
+        m(a, {
           status: "dry_run",
           ok: !0,
           diagnostics: o.diagnostics,
           plan: c
-        }, no(c));
+        }, po(c));
         return;
       }
       const d = o.client;
       if (!d) throw new Error("Registry validation did not create a publish client.");
-      if (!o.inspection.artifactManifest) throw new Error("Artifact manifest is required before publishing.");
-      const u = await to({
-        artifactManifestPath: o.paths.artifactManifest,
-        sourceManifest: o.inspection.sourceManifest
-      }), l = await so({
+      const l = await co({
+        sourceManifest: o.inspection.sourceManifest,
+        projectRoot: o.paths.root
+      }), u = await io({
+        artifactManifestPath: o.paths.sourceManifest,
+        registryAssets: l.artifactManifestRegistryAssets
+      }), p = await oo({
         artifactFiles: c.files,
         sourceManifest: o.inspection.sourceManifest,
         artifactDirectory: o.paths.artifactDirectory,
         projectRoot: o.paths.root,
-        artifactManifestBody: u.body
-      }), p = await d.uploads.create({
+        artifactManifestBody: u.body,
+        registryAssetsFiles: l.files
+      }), h = await d.uploads.create({
         appId: o.appId,
         manifest: u.document,
-        files: l.map((R) => ({
-          path: R.uploadPath,
-          size: R.size,
-          contentType: R.contentType
+        files: p.map((A) => ({
+          path: A.uploadPath,
+          size: A.size,
+          contentType: A.contentType
         }))
       });
-      for (const R of l) {
-        const V = p.files.find((D) => D.path === R.uploadPath);
-        if (!V) throw new Error(`No upload URL returned for ${R.uploadPath}`);
-        const B = await fetch(V.url, {
-          method: V.method,
-          headers: V.headers,
-          body: await eo(R)
+      for (const A of p) {
+        const U = h.files.find((he) => he.path === A.uploadPath);
+        if (!U) throw new Error(`No upload URL returned for ${A.uploadPath}`);
+        const O = await fetch(U.url, {
+          method: U.method,
+          headers: U.headers,
+          body: await ao(A)
         });
-        if (!B.ok) throw new Error(`Upload failed for ${R.uploadPath}: ${B.status}`);
+        if (!O.ok) throw new Error(`Upload failed for ${A.uploadPath}: ${O.status}`);
       }
-      const m = await d.uploads.complete(p.uploadId, n.forceApprove ? { forceApprove: !0 } : void 0), A = m.status === "approved" ? `Approved app ${m.appId} version ${m.appVersionId} and connected it to production.` : `Submitted app ${m.appId} version ${m.appVersionId} to staging.`;
-      f(a, {
-        status: m.status === "approved" ? "publish_approved" : "publish_submitted",
-        appId: m.appId,
-        appVersionId: m.appVersionId,
-        uploadId: p.uploadId,
-        versionRootUrl: m.versionRootUrl,
-        ...m.registryAssets.length > 0 ? { registryAssets: m.registryAssets } : {}
-      }, A);
+      const b = await d.uploads.complete(h.uploadId, n.forceApprove ? { forceApprove: !0 } : void 0), $ = b.status === "approved" ? `Approved app ${b.appId} version ${b.appVersionId} and connected it to production.` : `Submitted app ${b.appId} version ${b.appVersionId} to staging.`;
+      m(a, {
+        status: b.status === "approved" ? "publish_approved" : "publish_submitted",
+        appId: b.appId,
+        appVersionId: b.appVersionId,
+        uploadId: h.uploadId,
+        versionRootUrl: b.versionRootUrl,
+        ...b.registryAssets.length > 0 ? { registryAssets: b.registryAssets } : {}
+      }, $);
     } catch (o) {
       if (y(1), a.json) {
         a.result({
@@ -3954,10 +4005,10 @@ function Bs(e, t, s) {
     }
   });
 }
-async function eo(e) {
-  return e.body ? e.body : I(x(e.root, e.path));
+async function ao(e) {
+  return e.body ? e.body : I(B(e.root, e.path));
 }
-async function to(e) {
+async function io(e) {
   const t = await I(e.artifactManifestPath, "utf8");
   let s;
   try {
@@ -3966,69 +4017,141 @@ async function to(e) {
     throw new Error("manifest.json must be valid JSON");
   }
   if (!s || typeof s != "object" || Array.isArray(s)) throw new Error("manifest.json must be a JSON object");
-  const r = { ...s }, n = e.sourceManifest?.registryAssets;
-  return !n || n.kind === "none" ? r.registryAssets === void 0 ? {
+  const r = { ...s }, n = e.registryAssets;
+  return n.kind === "none" ? (delete r.registryAssets, {
     document: r,
-    body: void 0
-  } : (delete r.registryAssets, {
-    document: r,
-    body: Dt(r)
+    body: Ye(r)
   }) : (r.registryAssets = n.kind === "inline" ? n.assets : n.paths.length === 1 ? n.paths[0] : n.paths, {
     document: r,
-    body: Dt(r)
+    body: Ye(r)
   });
 }
-function Dt(e) {
+function Ye(e) {
   return Buffer.from(`${JSON.stringify(e, null, 2)}
 `);
 }
-async function so(e) {
-  const t = e.artifactFiles.map((a) => ({
-    ...a,
-    ...a.path === "manifest.json" && e.artifactManifestBody ? {
+async function oo(e) {
+  const t = e.artifactFiles.map((r) => ({
+    ...r,
+    ...r.path === "manifest.json" && e.artifactManifestBody ? {
       size: e.artifactManifestBody.byteLength,
       body: e.artifactManifestBody
     } : {},
-    uploadPath: a.path,
+    uploadPath: r.path,
     root: e.artifactDirectory
-  })), s = new Set(t.map((a) => a.uploadPath)), r = /* @__PURE__ */ new Set(), n = [];
-  if (e.sourceManifest?.registryAssets.kind === "inline") n.push(...e.sourceManifest.registryAssets.assets);
-  else if (e.sourceManifest?.registryAssets.kind === "files") for (const a of e.sourceManifest.registryAssets.paths) {
-    const o = {
-      path: a,
-      uploadPath: a,
-      size: (await re(x(e.projectRoot, a))).size,
-      contentType: Ie(a),
-      root: e.projectRoot
-    }, c = t.findIndex((u) => u.uploadPath === a);
-    c >= 0 ? t[c] = o : t.push(o), s.add(a);
-    const d = rn(await I(x(e.projectRoot, a), "utf8"));
-    n.push(...d.assets);
+  }));
+  e.artifactManifestBody && !t.some((r) => r.uploadPath === "manifest.json") && t.push({
+    path: ve,
+    uploadPath: ve,
+    size: e.artifactManifestBody.byteLength,
+    contentType: X(ve),
+    root: e.artifactDirectory,
+    body: e.artifactManifestBody
+  });
+  const s = new Set(t.map((r) => r.uploadPath));
+  for (const r of e.registryAssetsFiles) {
+    const n = t.findIndex((a) => a.uploadPath === r.uploadPath);
+    n >= 0 ? t[n] = r : t.push(r), s.add(r.uploadPath);
   }
-  for (const a of n) {
-    if (!a.source) continue;
-    const o = me(a.source, `registryAssets.${a.id}.source`);
-    if (o.kind !== "artifactPath" || r.has(o.path)) continue;
-    r.add(o.path);
-    const c = as(o.path);
-    if (!s.has(c)) {
-      const d = await re(x(e.projectRoot, o.path));
-      t.push({
-        path: o.path,
-        uploadPath: c,
-        size: d.size,
-        contentType: Ie(o.path),
-        root: e.projectRoot
-      }), s.add(c);
-    }
+  if (e.sourceManifest?.registryAssets.kind === "files") for (const r of e.sourceManifest.registryAssets.paths) {
+    if (s.has(r)) continue;
+    const n = {
+      path: r,
+      uploadPath: r,
+      size: (await Ee(B(e.projectRoot, r))).size,
+      contentType: X(r),
+      root: e.projectRoot
+    }, a = t.findIndex((o) => o.uploadPath === r);
+    a >= 0 ? t[a] = n : t.push(n), s.add(r);
   }
   return t;
 }
-function ro(e, t, s, r) {
+async function co(e) {
+  const t = e.sourceManifest?.registryAssets;
+  if (!t || t.kind === "none") return {
+    artifactManifestRegistryAssets: { kind: "none" },
+    files: []
+  };
+  if (t.kind === "inline") {
+    const c = await We(e.projectRoot, t.assets);
+    return {
+      artifactManifestRegistryAssets: {
+        kind: "inline",
+        assets: c.assets
+      },
+      files: c.files.map((d) => zt(d, e.projectRoot))
+    };
+  }
+  const s = [], r = [];
+  for (const c of t.paths) {
+    const d = lo(await I(B(e.projectRoot, c), "utf8"));
+    s.push({
+      path: c,
+      document: d.document,
+      assets: d.assets
+    }), r.push(...d.assets);
+  }
+  const n = await We(e.projectRoot, r), a = n.files.map((c) => zt(c, e.projectRoot));
+  let o = 0;
+  for (const c of s) {
+    const d = n.assets.slice(o, o + c.assets.length);
+    o += c.assets.length;
+    const l = Ye({
+      ...c.document,
+      assets: d
+    });
+    a.push({
+      path: c.path,
+      uploadPath: c.path,
+      size: l.byteLength,
+      contentType: X(c.path),
+      root: e.projectRoot,
+      body: l
+    });
+  }
+  return {
+    artifactManifestRegistryAssets: {
+      kind: "files",
+      paths: t.paths
+    },
+    files: a
+  };
+}
+function lo(e) {
+  let t;
+  try {
+    t = JSON.parse(e);
+  } catch {
+    throw new Error("Registry assets manifest must be valid JSON");
+  }
+  if (!t || typeof t != "object" || Array.isArray(t)) throw new Error("Registry assets manifest must be a JSON object");
+  const s = on(e);
+  return {
+    document: t,
+    assets: s.assets
+  };
+}
+function zt(e, t) {
+  return e.kind === "remote" ? {
+    path: e.uploadPath,
+    uploadPath: e.uploadPath,
+    size: e.size,
+    contentType: e.contentType,
+    root: t,
+    body: Buffer.from(e.bytes)
+  } : {
+    path: e.path,
+    uploadPath: e.uploadPath,
+    size: e.size,
+    contentType: e.contentType,
+    root: "/"
+  };
+}
+function uo(e, t, s, r) {
   const n = t.find((a) => a.severity === "error");
   if (y(2), n?.code === "app_not_claimed") {
     const a = r ?? "unknown";
-    f(e, {
+    m(e, {
       status: "app_not_claimed",
       appId: a,
       nextCommand: "registry claim"
@@ -4038,38 +4161,21 @@ Run:
   registry claim`);
     return;
   }
-  if (n?.code === "manifest_missing_app_id" && n.source === "manifest") {
-    f(e, {
+  if (n?.code === "manifest_missing_app_id") {
+    m(e, {
       status: "manifest_missing_app_id",
       manifestPath: s.paths.sourceManifest,
       message: "Source manifest must include appId before publishing."
     }, `Source manifest ${s.paths.sourceManifest} must include appId before publishing.`);
     return;
   }
-  if (n?.code === "manifest_missing_app_id" && n.source === "artifact") {
-    f(e, {
-      status: "manifest_missing_app_id",
-      manifestPath: s.paths.artifactManifest,
-      message: "Artifact manifest must include appId before publishing."
-    }, `Artifact manifest ${s.paths.artifactManifest} must include appId before publishing.`);
-    return;
-  }
-  if (n?.code === "artifact_app_id_mismatch") {
-    f(e, {
-      status: "manifest_app_id_mismatch",
-      sourceAppId: s.sourceManifest?.appId ?? r,
-      artifactAppId: s.artifactManifest?.appId ?? null,
-      message: "Source and artifact manifest appId values must match."
-    }, n.message);
-    return;
-  }
-  f(e, {
+  m(e, {
     status: n?.code ?? "error",
     message: n?.message ?? "Registry publish validation failed.",
     diagnostics: t
   }, fe(t));
 }
-function no(e) {
+function po(e) {
   const t = e.remoteState.kind === "unknown" ? `
 Remote state: unknown (local dry-run).` : "";
   return [
@@ -4079,39 +4185,39 @@ Remote state: unknown (local dry-run).` : "";
   ].join(`
 `) + t;
 }
-function ao(e, t) {
+function mo(e, t) {
   e.command("status").argument("[root]", "Primer app project root", ".").description("Show Registry state for a Primer app").option("--app-id <app-id>", "Registry app ID").option("--json", "Print a machine-readable result").action(async (s, r) => {
-    const n = _({
-      json: k(e, r),
+    const n = E({
+      json: _(e, r),
       write: t.write
     });
     try {
-      const { client: a } = await ie(e, t), o = r.appId ? null : await io(s), c = r.appId || o;
+      const { client: a } = await ce(e, t), o = r.appId ? null : await fo(s), c = r.appId || o;
       if (!c) {
-        y(2), f(n, {
+        y(2), m(n, {
           status: "manifest_missing_app_id",
           manifestHasAppId: !1,
           nextCommand: "registry claim"
         }, "Source manifest is missing appId. Run: registry claim");
         return;
       }
-      const d = rs.parse(await a.apps.get(c)), u = d.exists ? await oo(a, c) : null, l = u ? await co(a, c) : [], p = {
+      const d = cs.parse(await a.apps.get(c)), l = d.exists ? await ho(a, c) : null, u = l ? await go(a, c) : [], p = {
         status: "registry_status_shown",
         appId: c,
         manifestHasAppId: r.appId ? null : !!o,
-        versionsAccessible: !!u,
+        versionsAccessible: !!l,
         app: d,
         latestVersions: {
-          submitted: u?.find((m) => m.status === "submitted") || null,
-          approved: u?.find((m) => m.status === "approved") || null,
-          rejected: u?.find((m) => m.status === "rejected") || null
+          submitted: l?.find((h) => h.status === "submitted") || null,
+          approved: l?.find((h) => h.status === "approved") || null,
+          rejected: l?.find((h) => h.status === "rejected") || null
         },
-        channels: l,
-        nextCommand: lo(d.exists, u?.length || 0)
+        channels: u,
+        nextCommand: wo(d.exists, l?.length || 0)
       };
-      f(n, p, po(p));
+      m(n, p, bo(p));
     } catch (a) {
-      if (y(a instanceof E && a.status >= 400 && a.status < 500 ? 2 : 1), n.json) {
+      if (y(a instanceof P && a.status >= 400 && a.status < 500 ? 2 : 1), n.json) {
         n.result({
           status: "error",
           message: a instanceof Error ? a.message : "Registry status failed"
@@ -4122,26 +4228,26 @@ function ao(e, t) {
     }
   });
 }
-async function io(e) {
-  return (await Ta(q({ root: e }).sourceManifest)).appId || null;
+async function fo(e) {
+  return (await xa(D({ root: e }).sourceManifest)).appId || null;
 }
-async function oo(e, t) {
+async function ho(e, t) {
   try {
     return (await e.versions.list({ appId: t })).appVersions;
   } catch (s) {
-    if (s instanceof E && s.status === 403) return null;
+    if (s instanceof P && s.status === 403) return null;
     throw s;
   }
 }
-async function co(e, t) {
+async function go(e, t) {
   try {
-    return await uo(e, t);
+    return await yo(e, t);
   } catch (s) {
-    if (s instanceof E && s.status === 403) return [];
+    if (s instanceof P && s.status === 403) return [];
     throw s;
   }
 }
-async function uo(e, t) {
+async function yo(e, t) {
   const s = (await e.channels.list()).channels, r = [];
   for (const n of s) {
     const a = await e.channels.assignments(n.id, { appId: t });
@@ -4149,10 +4255,10 @@ async function uo(e, t) {
   }
   return r;
 }
-function lo(e, t) {
+function wo(e, t) {
   return e ? t === 0 ? "registry publish" : null : "registry claim";
 }
-function po(e) {
+function bo(e) {
   const t = e.app.exists ? e.app.claim.claimedByCurrentUser ? `claimed by this account (${e.app.claim.role})` : "claimed by another account" : "available", s = e.versionsAccessible ? Object.entries(e.latestVersions).map(([a, o]) => `${a}: ${o ? o.id : "-"}`) : ["versions: not accessible"], r = e.versionsAccessible ? ["staging", "prod"].map((a) => {
     const o = e.channels.find((c) => c.channelId === a);
     return `${a}: ${o ? o.appVersionId : "-"}`;
@@ -4166,14 +4272,14 @@ function po(e) {
   ].join(`
 `);
 }
-function mo(e, t) {
+function vo(e, t) {
   const s = e.command("token").description("Manage long-lived Registry access tokens");
-  s.command("create").description("Create a Registry access token and print its secret once").requiredOption("--title <title>", "Token title").option("-w, --write", "Create a write token").option("--reviewer", "Create a reviewer token").option("-a, --admin", "Create an admin token").option("--testing", "Create a testing token").option("-p, --permission <permission>", "Add a permission; repeat or use comma-separated/grouped values", bo, []).option("--expires-at <datetime>", "ISO 8601 expiry with timezone").option("--json", "Print JSON output").action(async (n) => {
-    await U(e, t, n, async ({ client: a }) => {
-      const o = fo(n), c = await a.tokens.create({
+  s.command("create").description("Create a Registry access token and print its secret once").requiredOption("--title <title>", "Token title").option("-w, --write", "Create a write token").option("--reviewer", "Create a reviewer token").option("-a, --admin", "Create an admin token").option("--testing", "Create a testing token").option("-p, --permission <permission>", "Add a permission; repeat or use comma-separated/grouped values", Po, []).option("--expires-at <datetime>", "ISO 8601 expiry with timezone").option("--json", "Print JSON output").action(async (n) => {
+    await M(e, t, n, async ({ client: a }) => {
+      const o = Ro(n), c = await a.tokens.create({
         title: n.title,
         permissions: o,
-        expiresAt: n.expiresAt ? Lt(n.expiresAt, t.now()).toISOString() : null
+        expiresAt: n.expiresAt ? Jt(n.expiresAt, t.now()).toISOString() : null
       });
       return {
         payload: c,
@@ -4181,9 +4287,9 @@ function mo(e, t) {
       };
     });
   }), s.command("update").argument("<token-id>").description("Update Registry access token metadata").option("--title <title>", "Token title").option("--expires-at <datetime>", "ISO 8601 expiry with timezone").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = {};
-      if (a.title !== void 0 && (c.title = a.title), a.expiresAt !== void 0 && (c.expiresAt = Lt(a.expiresAt, t.now()).toISOString()), Object.keys(c).length === 0) throw new Error("Provide at least one token update option");
+      if (a.title !== void 0 && (c.title = a.title), a.expiresAt !== void 0 && (c.expiresAt = Jt(a.expiresAt, t.now()).toISOString()), Object.keys(c).length === 0) throw new Error("Provide at least one token update option");
       const d = await o.tokens.update(n, c);
       return {
         payload: d,
@@ -4191,15 +4297,15 @@ function mo(e, t) {
       };
     });
   }), s.command("list").description("List your Registry access tokens").option("--json", "Print JSON output").action(async (n) => {
-    await U(e, t, n, async ({ client: a }) => {
+    await M(e, t, n, async ({ client: a }) => {
       const o = await a.tokens.list();
       return {
         payload: o,
-        message: Ro(o.tokens)
+        message: ko(o.tokens)
       };
     });
   }), s.command("status").argument("<token-id>").description("Show a Registry access token status").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = await o.tokens.status(n);
       return {
         payload: c,
@@ -4207,7 +4313,7 @@ function mo(e, t) {
       };
     });
   }), s.command("grant").argument("<token-id>").requiredOption("--app-id <appId>", "App ID").description("Grant a Registry access token to an app").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = await o.tokens.grant(n, { appId: a.appId });
       return {
         payload: c,
@@ -4215,7 +4321,7 @@ function mo(e, t) {
       };
     });
   }), s.command("ungrant").argument("<token-id>").requiredOption("--app-id <appId>", "App ID").description("Remove a Registry access token app grant").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = await o.tokens.ungrant(n, { appId: a.appId });
       return {
         payload: c,
@@ -4223,7 +4329,7 @@ function mo(e, t) {
       };
     });
   }), s.command("delete").argument("<token-id>").description("Delete a Registry access token").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = await o.tokens.delete(n);
       return {
         payload: c,
@@ -4233,20 +4339,20 @@ function mo(e, t) {
   });
   const r = s.command("permissions").alias("p").description("Manage Registry access token permissions");
   r.command("list").argument("<token-id>").description("List canonical Registry access token permissions").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(e, t, a, async ({ client: o }) => {
+    await M(e, t, a, async ({ client: o }) => {
       const c = await o.tokens.listPermissions(n);
       return {
         payload: c,
-        message: zs(c.permissions)
+        message: Ws(c.permissions)
       };
     });
-  }), Fe(r, e, t, "set"), Fe(r, e, t, "add"), Fe(r, e, t, "remove");
+  }), Je(r, e, t, "set"), Je(r, e, t, "add"), Je(r, e, t, "remove");
 }
-function fo(e) {
-  const t = go(e), s = ho(e);
-  return s ? Ze([...kr(s), ...t]) : t;
+function Ro(e) {
+  const t = Io(e), s = So(e);
+  return s ? rt([...$r(s), ...t]) : t;
 }
-function ho(e) {
+function So(e) {
   const t = [
     e.write,
     e.reviewer,
@@ -4261,30 +4367,30 @@ function ho(e) {
     if (e.write) return "write";
   }
 }
-function go(e) {
-  return Ze(Fs(e.permission ?? []));
+function Io(e) {
+  return rt(Hs(e.permission ?? []));
 }
-function yo(e) {
-  return Ze(Fs(e));
+function Ao(e) {
+  return rt(Hs(e));
 }
-function bo(e, t = []) {
+function Po(e, t = []) {
   return [...t, e];
 }
-function Fe(e, t, s, r) {
+function Je(e, t, s, r) {
   e.command(r).argument("<permissions...>", "Permissions; use space-separated, comma-separated, or grouped values").description(`${r[0].toUpperCase()}${r.slice(1)} Registry access token permissions`).requiredOption("-t, --token-id <token-id>", "Registry access token ID").option("--json", "Print JSON output").action(async (n, a) => {
-    await U(t, s, a, async ({ client: o }) => {
-      const c = { permissions: yo(n) }, d = r === "set" ? await o.tokens.setPermissions(a.tokenId, c) : r === "add" ? await o.tokens.addPermissions(a.tokenId, c) : await o.tokens.removePermissions(a.tokenId, c);
+    await M(t, s, a, async ({ client: o }) => {
+      const c = { permissions: Ao(n) }, d = r === "set" ? await o.tokens.setPermissions(a.tokenId, c) : r === "add" ? await o.tokens.addPermissions(a.tokenId, c) : await o.tokens.removePermissions(a.tokenId, c);
       return {
         payload: d,
-        message: zs(d.permissions)
+        message: Ws(d.permissions)
       };
     });
   });
 }
-function Fs(e) {
-  return e.flatMap((t) => Js(t).flatMap(wo));
+function Hs(e) {
+  return e.flatMap((t) => Gs(t).flatMap(Eo));
 }
-function Js(e, t = {}) {
+function Gs(e, t = {}) {
   const s = [];
   let r = 0, n = 0;
   for (let o = 0; o < e.length; o += 1) {
@@ -4301,15 +4407,15 @@ function Js(e, t = {}) {
   if (t.rejectEmpty && a.some((o) => !o)) throw new Error("Permission group contains an empty item");
   return a.filter(Boolean);
 }
-function wo(e) {
-  vo(e);
+function Eo(e) {
+  _o(e);
   const t = /^([a-z]+(?:\.[a-z]+)*)\.\(([^()]+)\)$/.exec(e);
   if (!t) return [e];
   const [, s, r] = t;
   if (!s) throw new Error("Permission group has an empty prefix");
-  return Js(r, { rejectEmpty: !0 }).map((n) => `${s}.${n}`);
+  return Gs(r, { rejectEmpty: !0 }).map((n) => `${s}.${n}`);
 }
-function vo(e) {
+function _o(e) {
   let t = 0;
   for (const s of e) {
     if (s === "(" && (t += 1, t > 1))
@@ -4321,26 +4427,26 @@ function vo(e) {
   }
   if (t > 0) throw new Error("Permission list has an unmatched opening parenthesis");
 }
-function Lt(e, t) {
+function Jt(e, t) {
   if (!/[zZ]|[+-]\d{2}:\d{2}$/.test(e)) throw new Error("--expires-at requires an explicit timezone or offset");
   const s = new Date(e);
   if (Number.isNaN(s.getTime())) throw new Error("--expires-at must be an ISO 8601 datetime");
   if (s.getTime() <= t) throw new Error("--expires-at must be in the future");
   return s;
 }
-function U(e, t, s, r) {
-  return O(e, t, s, r, {
+function M(e, t, s, r) {
+  return q(e, t, s, r, {
     defaultErrorMessage: "Registry token command failed",
     tokenPolicy: "browser-session-only"
   });
 }
-function Ro(e) {
-  return C({
+function ko(e) {
+  return x({
     columns: [
       {
         header: "TOKEN ID",
         value: (t) => t.id,
-        color: b.id
+        color: w.id
       },
       {
         header: "TITLE",
@@ -4353,15 +4459,15 @@ function Ro(e) {
       {
         header: "STATUS",
         value: (t) => t.deletedAt ? "deleted" : "active",
-        color: So
+        color: jo
       }
     ],
     rows: e,
     emptyMessage: "No Registry access tokens found."
   });
 }
-function zs(e) {
-  return C({
+function Ws(e) {
+  return x({
     columns: [{
       header: "PERMISSION",
       value: (t) => t
@@ -4370,13 +4476,13 @@ function zs(e) {
     emptyMessage: "No Registry access token permissions found."
   });
 }
-function So(e) {
-  return e.trim() === "active" ? b.success(e) : b.warning(e);
+function jo(e) {
+  return e.trim() === "active" ? w.success(e) : w.warning(e);
 }
-function Io(e, t) {
+function To(e, t) {
   const s = e.command("versions").alias("v").description("Manage Registry app versions");
-  Zi(s, e, t), Ga(s, e, t), s.command("approve").argument("<version-id>", "App version UUID").option("--reason <text>", "Review reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await se(e, t, n, async ({ client: a }) => {
+  no(s, e, t), Qa(s, e, t), s.command("approve").argument("<version-id>", "App version UUID").option("--reason <text>", "Review reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
+    await ne(e, t, n, async ({ client: a }) => {
       const o = await a.versions.approve(r, { reason: n.reason });
       return {
         payload: {
@@ -4387,7 +4493,7 @@ function Io(e, t) {
       };
     });
   }), s.command("reject").argument("<version-id>", "App version UUID").requiredOption("--reason <text>", "Rejection reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await se(e, t, n, async ({ client: a }) => {
+    await ne(e, t, n, async ({ client: a }) => {
       const o = await a.versions.reject(r, { reason: n.reason });
       return {
         payload: {
@@ -4398,8 +4504,8 @@ function Io(e, t) {
       };
     });
   }), s.command("delete").argument("<version-id>", "App version UUID").option("--reason <text>", "Deletion reason").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await se(e, t, n, async ({ client: a }) => {
-      Ao(n);
+    await ne(e, t, n, async ({ client: a }) => {
+      $o(n);
       const o = await a.versions.delete(r, { reason: n.reason });
       return {
         payload: {
@@ -4410,9 +4516,9 @@ function Io(e, t) {
         message: `Soft-deleted app version ${o.appVersion.id}.`
       };
     });
-  }), Os(s.command("list").option("--app-id <app-id>", "Filter by app ID").option("--status <status>", "Filter by status: submitted, approved, or rejected").option("--channel <channel-id>", "Filter by current channel assignment")).option("--json", "Print a machine-readable result").action(async (r) => {
-    await se(e, t, r, async ({ client: n }) => {
-      const a = await qs(r), o = await n.versions.list({
+  }), Ls(s.command("list").option("--app-id <app-id>", "Filter by app ID").option("--status <status>", "Filter by status: submitted, approved, or rejected").option("--channel <channel-id>", "Filter by current channel assignment")).option("--json", "Print a machine-readable result").action(async (r) => {
+    await ne(e, t, r, async ({ client: n }) => {
+      const a = await Vs(r), o = await n.versions.list({
         appId: r.appId,
         status: r.status,
         channel: r.channel,
@@ -4423,44 +4529,44 @@ function Io(e, t) {
           status: "versions_listed",
           appVersions: o.appVersions
         },
-        message: $o(o.appVersions)
+        message: qo(o.appVersions)
       };
     });
   }), s.command("show").argument("<version-id>", "App version UUID").option("--json", "Print a machine-readable result").action(async (r, n) => {
-    await se(e, t, n, async ({ client: a }) => {
+    await ne(e, t, n, async ({ client: a }) => {
       const o = await a.versions.show(r);
       return {
         payload: {
           status: "version_shown",
           appVersion: o.appVersion
         },
-        message: To(o.appVersion)
+        message: No(o.appVersion)
       };
     });
   });
 }
-async function se(e, t, s, r) {
-  await O(e, t, s, r, {
+async function ne(e, t, s, r) {
+  await q(e, t, s, r, {
     defaultErrorMessage: "Registry versions command failed",
-    formatError: Eo,
-    isUsageError: Po
+    formatError: xo,
+    isUsageError: Co
   });
 }
-function Ao(e) {
-  if (!e.reason?.trim()) throw new Hs("Provide a deletion reason with --reason <text>");
+function $o(e) {
+  if (!e.reason?.trim()) throw new Qs("Provide a deletion reason with --reason <text>");
 }
-var Hs = class extends Error {
+var Qs = class extends Error {
 };
-function Po(e) {
-  return e instanceof Hs || e instanceof Ae;
+function Co(e) {
+  return e instanceof Qs || e instanceof Pe;
 }
-function Eo(e) {
-  if (e instanceof E) {
-    const t = _o(e);
+function xo(e) {
+  if (e instanceof P) {
+    const t = Uo(e);
     return {
       status: t,
-      message: ko(e, t),
-      ...jo(e)
+      message: Oo(e, t),
+      ...Mo(e)
     };
   }
   return {
@@ -4468,49 +4574,49 @@ function Eo(e) {
     message: e instanceof Error ? e.message : "Registry versions command failed"
   };
 }
-function _o(e) {
+function Uo(e) {
   return e.code === "permission_denied" || e.code === "forbidden" || e.status === 403 ? "permission_denied" : e.code === "version_not_found" || e.status === 404 ? "version_not_found" : e.code === "version_already_deleted" ? "version_already_deleted" : e.code === "version_delete_blocked_by_channel" ? "version_delete_blocked_by_channel" : "error";
 }
-function ko(e, t) {
+function Oo(e, t) {
   if (t !== "version_delete_blocked_by_channel") return e.message;
-  const s = Gs(e), r = s.length > 0 ? ` Blocking channels: ${s.join(", ")}.` : "";
+  const s = Ys(e), r = s.length > 0 ? ` Blocking channels: ${s.join(", ")}.` : "";
   return `${e.message}.${r} Disconnect or reconnect the blocking channels before deleting this version.`;
 }
-function jo(e) {
-  const t = Gs(e);
+function Mo(e) {
+  const t = Ys(e);
   return t.length > 0 ? { blockingChannels: t } : {};
 }
-function Gs(e) {
-  return e instanceof Rs ? e.blockingChannelIds : [];
+function Ys(e) {
+  return e instanceof As ? e.blockingChannelIds : [];
 }
-function To(e) {
+function No(e) {
   return `${e.id}
 App: ${e.appId}
 Status: ${e.status}
-Channels: ${Ws(e)}
+Channels: ${Ks(e)}
 Title: ${e.title}`;
 }
-function $o(e) {
-  return e.length === 0 ? "No app versions found." : C({
+function qo(e) {
+  return e.length === 0 ? "No app versions found." : x({
     columns: [
       {
         header: "VERSION ID",
         value: (t) => t.id,
-        color: b.id
+        color: w.id
       },
       {
         header: "APP ID",
         value: (t) => t.appId,
-        color: b.id
+        color: w.id
       },
       {
         header: "STATUS",
         value: (t) => t.status,
-        color: Co
+        color: Do
       },
       {
         header: "CHANNELS",
-        value: Ws
+        value: Ks
       },
       {
         header: "TITLE",
@@ -4521,17 +4627,17 @@ function $o(e) {
     emptyMessage: "No app versions found."
   });
 }
-function Co(e) {
+function Do(e) {
   const t = e.trim();
-  return t === "approved" ? b.success(e) : t === "rejected" ? b.warning(e) : e;
+  return t === "approved" ? w.success(e) : t === "rejected" ? w.warning(e) : e;
 }
-function Ws(e) {
+function Ks(e) {
   return e.channels && e.channels.length > 0 ? e.channels.map((t) => t.channelId).join(",") : "-";
 }
-async function Uo(e, t = {}) {
-  const s = `${e} ${t.defaultValue === !1 ? "[y/N]" : "[Y/n]"} `, r = Ft({
-    input: Jt,
-    output: zt
+async function Lo(e, t = {}) {
+  const s = `${e} ${t.defaultValue === !1 ? "[y/N]" : "[Y/n]"} `, r = Wt({
+    input: Qt,
+    output: Yt
   });
   try {
     const n = (await r.question(s)).trim().toLowerCase();
@@ -4540,10 +4646,10 @@ async function Uo(e, t = {}) {
     r.close();
   }
 }
-async function xo(e, t = {}) {
-  const s = `${e}${t.defaultValue ? ` [${t.defaultValue}]` : ""} `, r = Ft({
-    input: Jt,
-    output: zt
+async function Vo(e, t = {}) {
+  const s = `${e}${t.defaultValue ? ` [${t.defaultValue}]` : ""} `, r = Wt({
+    input: Qt,
+    output: Yt
   });
   try {
     return (await r.question(s)).trim() || t.defaultValue || "";
@@ -4551,49 +4657,49 @@ async function xo(e, t = {}) {
     r.close();
   }
 }
-var Qs = x(ar(), ".config", "primer-registry"), ce = x(Qs, "session.json");
-async function Mo() {
-  return ze(ce) ? JSON.parse(await I(ce, "utf8")) : null;
+var Xs = B(cr(), ".config", "primer-registry"), le = B(Xs, "session.json");
+async function Bo() {
+  return Ge(le) ? JSON.parse(await I(le, "utf8")) : null;
 }
-async function Oo(e) {
-  await Bt(Qs, {
+async function Fo(e) {
+  await Gt(Xs, {
     recursive: !0,
     mode: 448
-  }), await Ge(ce, JSON.stringify(e, null, 2), { mode: 384 }), await Zs(ce, 384);
+  }), await Ke(le, JSON.stringify(e, null, 2), { mode: 384 }), await sr(le, 384);
 }
-async function qo() {
-  await tr(ce, { force: !0 });
+async function zo() {
+  await nr(le, { force: !0 });
 }
-var No = "x-registry-cli-version", Ys = "0.2.0";
-function Do(e = {}) {
+var Jo = "x-registry-cli-version", Zs = "0.3.0";
+function Ho(e = {}) {
   const t = {
     now: () => Date.now(),
-    openBrowser: Vo,
-    readSession: Mo,
-    removeSession: qo,
-    request: da,
-    saveSession: Oo,
-    sleep: Bo,
+    openBrowser: Wo,
+    readSession: Bo,
+    removeSession: zo,
+    request: pa,
+    saveSession: Fo,
+    sleep: Qo,
     write: (s) => console.log(s),
-    confirm: Uo,
-    promptText: xo,
+    confirm: Lo,
+    promptText: Vo,
     ...e
   };
   return {
     ...t,
-    request: Lo(t.request)
+    request: Go(t.request)
   };
 }
-function Lo(e) {
+function Go(e) {
   return (t, s, r) => e(t, s, {
     ...r,
     headers: {
       ...r?.headers,
-      [No]: Ys
+      [Jo]: Zs
     }
   });
 }
-function Vo(e) {
+function Wo(e) {
   const t = process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open", s = process.platform === "win32" ? [
     "/c",
     "start",
@@ -4601,7 +4707,7 @@ function Vo(e) {
     e
   ] : [e];
   return new Promise((r) => {
-    const n = nr(t, s, {
+    const n = or(t, s, {
       detached: !0,
       stdio: "ignore"
     });
@@ -4610,13 +4716,13 @@ function Vo(e) {
     });
   });
 }
-function Bo(e) {
+function Qo(e) {
   return new Promise((t) => setTimeout(t, e));
 }
-function Fo(e = {}) {
-  const t = Do(e), s = new Xs().name("registry").description("Primer Registry HTTP publishing CLI").version(Ys, "-V, --version", "Output the current version").option("-u, --registry-url <url>", "Registry URL").option("--token <access-token>", "Registry access token").option("--json", "Print machine-readable JSON output");
-  return la(s, t), Bi(s, t), qa(s, t), Ji(s, t), Xi(s, t), ao(s, t), mo(s, t), di(s, t), za(s, t), ti(s, t), Io(s, t), Ai(s, t), zi(s, t), ba(s, t), s;
+function Yo(e = {}) {
+  const t = Ho(e), s = new tr().name("registry").description("Primer Registry HTTP publishing CLI").version(Zs, "-V, --version", "Output the current version").option("-u, --registry-url <url>", "Registry URL").option("--token <access-token>", "Registry access token").option("--json", "Print machine-readable JSON output");
+  return fa(s, t), Gi(s, t), Da(s, t), Qi(s, t), ro(s, t), mo(s, t), vo(s, t), fi(s, t), Ga(s, t), ri(s, t), To(s, t), ki(s, t), Yi(s, t), Ra(s, t), s;
 }
-process.env.NODE_ENV !== "test" && await Fo().parseAsync().catch((e) => {
+process.env.NODE_ENV !== "test" && await Yo().parseAsync().catch((e) => {
   console.error(e instanceof Error ? e.message : String(e)), process.exitCode = 1;
 });
